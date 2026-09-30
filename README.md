@@ -30,7 +30,7 @@
 
 ```bash
 # 1. Clone
-git clone https://github.com/<your-username>/CineCritic.git
+git clone https://github.com/Kartik-pro/CineCritic.git
 cd CineCritic
 
 # 2. Create a virtual environment
