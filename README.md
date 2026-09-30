@@ -104,14 +104,6 @@ CineCritic/
 - **`ModuleNotFoundError`** — activate your virtual environment and re-run `pip install -r requirements.txt`.
 - **Model not found** — model names change often; check your provider's docs and update the *Model* field in the sidebar.
 
-## 🗺️ Roadmap
-
-- [ ] Real posters, ratings and trailers via the TMDB API
-- [ ] Watchlist saved between sessions
-- [ ] Streaming (typewriter) reviews
-- [ ] Filters for language, decade and "already seen"
-- [ ] Docker image and one-click deploy
-
 ## 🤝 Contributing
 
 Issues and pull requests are welcome. Fork the repo, create a feature branch, and open a PR with a short description of your change.
