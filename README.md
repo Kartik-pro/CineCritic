@@ -1,256 +1,121 @@
-🎬 CineCritic
+<div align="center">
 
-«An AI-powered movie critic and recommendation system.»
+# 🎬 CineCritic
 
-CineCritic is an intelligent movie analysis system built using Mistral AI, LangChain, and LangGraph. It analyzes movies across story, characters, themes, cinematography, and genre while using conversational memory to understand user preferences and provide personalized movie recommendations.
+**An AI movie critic with a cinema soul — punchy 50-word reviews and smart recommendations, powered by Mistral or Gemini.**
 
-The system can connect with internet sources and IMDb to retrieve accurate and up-to-date movie information.
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![Streamlit](https://img.shields.io/badge/UI-Streamlit-ff4b4b)
+![LangChain](https://img.shields.io/badge/LLM-LangChain-1c3c3c)
+![License](https://img.shields.io/badge/license-MIT-green)
 
----
-
-✨ Features
-
-- 🎭 Movie Analysis — Analyze story, characters, themes, and overall filmmaking.
-- 🎥 Cinematography Analysis — Discuss visual style, camera work, lighting, and presentation.
-- 🧠 AI Movie Critic — Generate structured critical reviews using Mistral AI.
-- 💾 Memory — Remember user preferences and previous interactions.
-- 🍿 Personalized Recommendations — Recommend movies based on the user's interests and conversation history.
-- 🌐 Web-Connected Research — Retrieve information from internet sources.
-- ⭐ IMDb Integration — Use IMDb information to improve movie-data accuracy.
-- 🔗 LangChain — Manage prompts, models, tools, and application workflows.
-- 🕸️ LangGraph — Build structured, stateful AI workflows.
-- 📝 Prompt Templates — Maintain consistent and customizable AI responses.
-- 🔍 Genre Comparison — Compare movies across genres, themes, and filmmaking styles.
-- 📊 Structured Reviews — Produce organized movie reviews and analysis.
+</div>
 
 ---
 
-🧠 How It Works
+## ✨ Features
 
-                    ┌──────────────────┐
-                    │     User Input   │
-                    └────────┬─────────┘
-                             │
-                             ▼
-                    ┌──────────────────┐
-                    │  Prompt Template │
-                    └────────┬─────────┘
-                             │
-                             ▼
-                    ┌──────────────────┐
-                    │    LangGraph     │
-                    │   AI Workflow    │
-                    └───────┬───┬──────┘
-                            │   │
-             ┌──────────────┘   └──────────────┐
-             ▼                                 ▼
-    ┌──────────────────┐              ┌──────────────────┐
-    │   Mistral AI     │              │ External Sources │
-    │  Movie Analysis  │              │ Web / IMDb Data  │
-    └────────┬─────────┘              └────────┬─────────┘
-             │                                 │
-             └──────────────┬──────────────────┘
-                            ▼
-                    ┌──────────────────┐
-                    │     Memory       │
-                    │ User Preferences │
-                    └────────┬─────────┘
-                             │
-                             ▼
-                    ┌──────────────────┐
-                    │ Final Analysis & │
-                    │ Recommendation   │
-                    └──────────────────┘
+- 🎞️ **Instant reviews** — type any movie and get a ticket-style review in **4–5 bullet points, max 50 words total**.
+- 🍿 **Smart recommendations** — describe a movie you loved, a mood, or a genre and get poster-style picks with a one-line reason each.
+- 🔁 **One-click flow** — hit *Review this →* on any recommendation to jump straight to its review.
+- 🔑 **Built-in API key manager** — paste your key in the sidebar and it is saved to `.env` automatically.
+- 🔌 **Multi-provider** — switch between **Mistral** and **Gemini** (and set any model name) without touching code.
+- 🎨 **Cinema theme** — dark glassmorphism UI, gold film-strip branding, ticket and poster cards.
 
----
+## 🖼️ Screenshots
 
-🛠️ Tech Stack
+> Add screenshots here after your first run, e.g. `docs/review.png` and `docs/recommend.png`.
 
-Technology| Purpose
-Python| Core application
-Mistral AI| Large Language Model
-LangChain| AI application framework
-LangGraph| Stateful workflow orchestration
-Prompt Templates| Structured AI prompting
-Memory| User preference and conversation context
-Web Sources| Current movie information
-IMDb| Movie metadata and reference information
+## 🚀 Quick Start
 
----
-
-🎯 Core Capabilities
-
-🎬 Movie Criticism
-
-CineCritic can analyze:
-
-- Story and plot
-- Characters and development
-- Themes and messages
-- Genre
-- Cinematography
-- Direction and filmmaking
-- Narrative structure
-- Strengths and weaknesses
-
-🍿 Personalized Recommendations
-
-Instead of simply recommending popular movies, CineCritic uses conversational memory to understand preferences such as:
-
-Favorite Genres
-       ↓
-Preferred Themes
-       ↓
-Previously Discussed Movies
-       ↓
-User Feedback
-       ↓
-Personalized Recommendations
-
-This allows recommendations to become more relevant as the user interacts with the system.
-
-🌐 Information Retrieval
-
-Movie information can be retrieved from external sources to supplement the AI's knowledge and reduce reliance on static model knowledge.
-
----
-
-🧩 LangGraph Workflow
-
-The application can be organized as a stateful graph where different nodes perform specific tasks.
-
-User Query
-    │
-    ▼
-Movie Identification
-    │
-    ▼
-Information Retrieval
-    │
-    ├──► Web Sources
-    │
-    └──► IMDb
-    │
-    ▼
-Movie Analysis
-    │
-    ▼
-Preference / Memory Check
-    │
-    ▼
-Recommendation Engine
-    │
-    ▼
-Final Response
-
-LangGraph allows the workflow to maintain state between these stages and makes it easier to extend CineCritic with additional tools and agents.
-
----
-
-📁 Project Structure
-
-CineCritic/
-│
-├── app/
-│   ├── main.py
-│   ├── chains/
-│   ├── graphs/
-│   ├── prompts/
-│   ├── memory/
-│   ├── tools/
-│   └── utils/
-│
-├── tests/
-│
-├── .env.example
-├── requirements.txt
-├── README.md
-└── .gitignore
-
-«The structure may evolve as new features and integrations are added.»
-
----
-
-⚙️ Installation
-
-1. Clone the repository
-
-git clone https://github.com/your-username/CineCritic.git
+```bash
+# 1. Clone
+git clone https://github.com/<your-username>/CineCritic.git
 cd CineCritic
 
-2. Create a virtual environment
+# 2. Create a virtual environment
+python -m venv .venv
+.venv\Scripts\activate          # Windows
+# source .venv/bin/activate     # macOS / Linux
 
-python -m venv venv
-
-Activate it:
-
-Windows
-
-venv\Scripts\activate
-
-Linux / macOS
-
-source venv/bin/activate
-
-3. Install dependencies
-
+# 3. Install dependencies
 pip install -r requirements.txt
 
-4. Configure environment variables
+# 4. Run
+streamlit run app.py
+```
 
-Create a ".env" file:
+Then open the sidebar, choose a provider, paste your API key and click **💾 Save to .env**. That's it.
 
-MISTRAL_API_KEY=your_mistral_api_key
+### API keys
 
-Add the required API credentials for your web/IMDb integration if those services require authentication.
+| Provider | Environment variable | Where to get a key |
+|----------|---------------------|--------------------|
+| Mistral  | `MISTRAL_API_KEY`   | [console.mistral.ai](https://console.mistral.ai) |
+| Gemini   | `GOOGLE_API_KEY`    | [aistudio.google.com](https://aistudio.google.com) |
 
----
+You can also copy `.env.example` to `.env` and fill it in by hand.
 
-🚀 Usage
+> 🔒 `.env` is listed in `.gitignore`. Never commit your keys.
 
-Run the application:
+## 🗂️ Project Structure
 
-python app/main.py
+```
+CineCritic/
+├── app.py                     # Streamlit entry point
+├── requirements.txt
+├── .env.example               # Template for API keys
+├── cinecritic/
+│   ├── config.py              # Paths, MAX_WORDS, supported providers
+│   ├── env_manager.py         # Load / save API keys in .env
+│   ├── llm.py                 # init_chat_model wrapper with caching
+│   ├── prompt_template.py     # Your critic system prompt (Cine_prompt)
+│   ├── prompts.py             # Review + recommendation prompt templates
+│   ├── schemas.py             # Pydantic models for structured output
+│   ├── services.py            # Review / recommendation logic (UI-independent)
+│   └── ui/
+│       ├── style.css          # Cinema theme
+│       ├── styles.py          # CSS injector
+│       ├── components.py      # HTML for hero, ticket and movie cards
+│       ├── sidebar.py         # Provider, model and API key panel
+│       ├── pages.py           # Review and Recommend pages
+│       └── state.py           # Session state and navigation
+```
 
-Example interaction:
+## ⚙️ How It Works
 
-User:
-I want a movie similar to Interstellar.
+1. **Review:** `prompts.py` sends your critic persona plus strict output rules to the model. `services.to_bullets()` then hard-caps the answer at `MAX_WORDS`, so the limit holds even if the model overshoots.
+2. **Recommend:** the model's reply is forced into a Pydantic schema (`Recommendations`) using `with_structured_output`, so cards render from clean objects instead of parsed text.
+3. **Providers:** `llm.py` uses LangChain's `init_chat_model("<provider>:<model>")`, so switching providers only changes a string.
 
-CineCritic:
-Based on your previous preferences for science fiction,
-emotional storytelling, and complex themes, here are some
-movies that may match your interests...
+## 🛠️ Customization
 
----
+| I want to... | Change |
+|--------------|--------|
+| Change the review length | `MAX_WORDS` in `cinecritic/config.py` |
+| Change the critic's personality | `Cine_prompt` in `cinecritic/prompt_template.py` |
+| Add another provider (e.g. OpenAI) | Add a `Provider(...)` entry in `config.py` and `pip install` its LangChain package |
+| Restyle the app | Edit `cinecritic/ui/style.css` |
 
-🔮 Future Improvements
+## 🩹 Troubleshooting
 
-- 🎯 More advanced recommendation algorithms
-- 🧠 Long-term user preference memory
-- 🎞️ Better movie similarity analysis
-- 🔎 Multiple web-source verification
-- 📊 Movie comparison dashboards
-- 🎥 Trailer and media integration
-- 🗣️ Conversational movie discovery
-- 📚 Larger movie knowledge base
-- ⚡ Improved LangGraph agent workflows
-- 🧪 Automated evaluation of AI-generated reviews
+- **`TypeError: expected str, got list`** — use `ChatPromptTemplate.from_messages([...])` for a list of messages; `from_template` only accepts a string. (This repo already does it correctly.)
+- **Missing-variable error from the prompt** — literal `{ }` in a prompt string are read as variables. Here the system prompt is sent as a `SystemMessage`, so braces are safe.
+- **`ModuleNotFoundError`** — activate your virtual environment and re-run `pip install -r requirements.txt`.
+- **Model not found** — model names change often; check your provider's docs and update the *Model* field in the sidebar.
 
----
+## 🗺️ Roadmap
 
-⚠️ Disclaimer
+- [ ] Real posters, ratings and trailers via the TMDB API
+- [ ] Watchlist saved between sessions
+- [ ] Streaming (typewriter) reviews
+- [ ] Filters for language, decade and "already seen"
+- [ ] Docker image and one-click deploy
 
-CineCritic is an AI-powered movie analysis project. AI-generated criticism and recommendations may contain inaccuracies or subjective interpretations. External movie information should be treated as reference data rather than an absolute judgment.
+## 🤝 Contributing
 
-IMDb and other external services remain the property of their respective owners.
+Issues and pull requests are welcome. Fork the repo, create a feature branch, and open a PR with a short description of your change.
 
----
+## 📄 License
 
-👨‍💻 Project
-
-CineCritic is an experimental AI project exploring how LLMs, memory, retrieval, and agentic workflows can be combined to create a personalized movie-analysis system.
-
-Built With
-
-Mistral AI · LangChain · LangGraph · Python
+Released under the [MIT License](LICENSE).
