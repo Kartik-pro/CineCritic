@@ -1,85 +1,735 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;600&display=swap');
-:root{--gold:#f5c518;--red:#e50914;--bg:#08080c;--card:rgba(255,255,255,.04);--line:rgba(255,255,255,.09);}
-.stApp{
+
+:root {
+  --gold: #f5c518;
+  --red: #e50914;
+  --bg: #08080c;
+  --card: rgba(255,255,255,.04);
+  --line: rgba(255,255,255,.09);
+}
+
+/* =========================================================
+   MAIN APP
+   ========================================================= */
+
+.stApp {
   background:
-    radial-gradient(circle at 15% 0%,rgba(229,9,20,.28),transparent 40%),
-    radial-gradient(circle at 85% 10%,rgba(245,197,24,.14),transparent 40%),
-    radial-gradient(circle at 50% 100%,rgba(90,40,160,.18),transparent 50%),
+    radial-gradient(circle at 15% 0%, rgba(229,9,20,.28), transparent 40%),
+    radial-gradient(circle at 85% 10%, rgba(245,197,24,.14), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(90,40,160,.18), transparent 50%),
     var(--bg);
-  color:#eee;font-family:'Inter',sans-serif;}
-#MainMenu,footer,header{visibility:hidden;}
-.block-container{padding-top:1.5rem;max-width:1100px;}
 
-/* Hero */
-.hero{text-align:center;padding:1rem 0 .4rem;}
-.strip{height:16px;margin:0 auto 10px;max-width:520px;border-radius:3px;background:
-  repeating-linear-gradient(90deg,#000 0 12px,transparent 12px 22px) center/100% 8px no-repeat,#1c1c1c;}
-.title{font-family:'Bebas Neue',sans-serif;font-size:5rem;letter-spacing:.2em;line-height:1;margin:0;
-  background:linear-gradient(180deg,#fff2b0,var(--gold) 45%,#b8860b);-webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;filter:drop-shadow(0 0 22px rgba(245,197,24,.35));}
-.tag{color:#9a9aa5;letter-spacing:.4em;text-transform:uppercase;font-size:.75rem;margin-top:.4rem;}
+  color: #eee;
+  font-family: 'Inter', sans-serif;
+}
 
-/* Nav radio as pills */
-div[role="radiogroup"]{justify-content:center;gap:.6rem;}
-div[role="radiogroup"] label{background:var(--card);border:1px solid var(--line);
-  border-radius:999px;padding:.35rem 1.3rem;transition:.2s;}
-div[role="radiogroup"] label:has(input:checked){background:linear-gradient(135deg,var(--red),#8a0710);
-  border-color:var(--gold);box-shadow:0 0 18px rgba(229,9,20,.5);}
-div[role="radiogroup"] label > div:first-child{display:none;}
+/* Keep Streamlit's native sidebar/menu controls available */
+#MainMenu,
+footer {
+  visibility: hidden;
+}
 
-/* Inputs */
-.stTextInput input,.stTextArea textarea,.stSelectbox div[data-baseweb="select"]>div{
-  background:rgba(255,255,255,.05)!important;color:#fff!important;border:1px solid var(--line)!important;
-  border-radius:12px!important;backdrop-filter:blur(6px);}
-.stTextInput input:focus,.stTextArea textarea:focus{border-color:var(--gold)!important;
-  box-shadow:0 0 0 2px rgba(245,197,24,.25)!important;}
+/* IMPORTANT:
+   Don't hide the Streamlit header because it contains
+   the sidebar toggle button on smaller screens.
+*/
+header {
+  background: transparent !important;
+}
 
-/* Buttons */
-.stButton>button{background:linear-gradient(135deg,var(--red),#8a0710);color:#fff;
-  border:1px solid rgba(245,197,24,.35);border-radius:12px;font-weight:600;letter-spacing:.06em;
-  padding:.55rem 1.4rem;transition:.2s;}
-.stButton>button:hover{transform:translateY(-2px);border-color:var(--gold);color:#fff;
-  box-shadow:0 8px 26px rgba(229,9,20,.5);}
+/* Main content */
 
-/* Review ticket */
-.ticket{position:relative;margin-top:1rem;padding:1.6rem 1.8rem 1.4rem;border-radius:18px;
-  background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
-  border:1px solid var(--line);backdrop-filter:blur(10px);box-shadow:0 20px 60px rgba(0,0,0,.55);}
-.ticket:before,.ticket:after{content:"";position:absolute;top:58px;width:22px;height:22px;
-  background:var(--bg);border-radius:50%;border:1px solid var(--line);}
-.ticket:before{left:-12px}.ticket:after{right:-12px}
-.ticket h2{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.08em;margin:0;color:#fff;}
-.ticket .sub{color:var(--gold);font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;}
-.ticket hr{border:none;border-top:2px dashed rgba(255,255,255,.15);margin:.9rem 0 1rem;}
-.ticket ul{list-style:none;padding:0;margin:0;}
-.ticket li{padding:.45rem 0 .45rem 2rem;position:relative;font-size:1.02rem;line-height:1.55;color:#e6e6ec;}
-.ticket li:before{content:"🎞️";position:absolute;left:0;top:.4rem;}
-.wc{margin-top:.8rem;color:#777;font-size:.75rem;text-align:right;letter-spacing:.1em;}
+.block-container {
+  padding-top: 1.5rem;
+  max-width: 1100px;
+}
 
-/* Movie cards */
-.mcard{border-radius:16px;overflow:hidden;background:var(--card);border:1px solid var(--line);
-  transition:.25s;height:100%;}
-.mcard:hover{transform:translateY(-6px);border-color:var(--gold);box-shadow:0 18px 44px rgba(0,0,0,.6);}
-.poster{height:120px;display:flex;align-items:center;justify-content:center;
-  font-family:'Bebas Neue',sans-serif;font-size:3.6rem;color:rgba(255,255,255,.9);letter-spacing:.05em;
-  text-shadow:0 4px 20px rgba(0,0,0,.5);}
-.mbody{padding:.9rem 1.1rem .6rem;}
-.mbody h3{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:.05em;margin:0;color:#fff;}
-.year{color:var(--gold);font-size:.78rem;letter-spacing:.15em;margin-bottom:.5rem;}
-.pill{display:inline-block;background:rgba(245,197,24,.1);color:var(--gold);
-  border:1px solid rgba(245,197,24,.3);border-radius:999px;padding:.05rem .6rem;font-size:.68rem;margin:0 .25rem .25rem 0;}
-.why{color:#c9c9d2;font-size:.88rem;line-height:1.5;margin-top:.4rem;}
-.sec{font-family:'Bebas Neue',sans-serif;letter-spacing:.15em;font-size:1.7rem;color:var(--gold);margin:1.2rem 0 .6rem;}
 
-/* Sidebar */
-section[data-testid="stSidebar"]{background:rgba(10,10,15,.95);border-right:1px solid var(--line);}
-.status{padding:.4rem .8rem;border-radius:10px;font-size:.8rem;margin:.3rem 0 .6rem;}
-.ok{background:rgba(46,160,67,.15);color:#56d364;border:1px solid rgba(46,160,67,.4);}
-.no{background:rgba(229,9,20,.12);color:#ff7b72;border:1px solid rgba(229,9,20,.4);}
-/* Make sidebar easier to access on mobile */
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero {
+  text-align: center;
+  padding: 1rem 0 .4rem;
+}
+
+.strip {
+  height: 16px;
+  margin: 0 auto 10px;
+  max-width: 520px;
+  border-radius: 3px;
+
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #000 0 12px,
+      transparent 12px 22px
+    )
+    center / 100% 8px no-repeat,
+    #1c1c1c;
+}
+
+.title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 5rem;
+  letter-spacing: .2em;
+  line-height: 1;
+  margin: 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      #fff2b0,
+      var(--gold) 45%,
+      #b8860b
+    );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  filter:
+    drop-shadow(
+      0 0 22px rgba(245,197,24,.35)
+    );
+}
+
+.tag {
+  color: #9a9aa5;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  font-size: .75rem;
+  margin-top: .4rem;
+}
+
+
+/* =========================================================
+   NAV RADIO AS PILLS
+   ========================================================= */
+
+div[role="radiogroup"] {
+  justify-content: center;
+  gap: .6rem;
+}
+
+div[role="radiogroup"] label {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: .35rem 1.3rem;
+  transition: .2s;
+}
+
+div[role="radiogroup"]
+label:has(input:checked) {
+  background:
+    linear-gradient(
+      135deg,
+      var(--red),
+      #8a0710
+    );
+
+  border-color: var(--gold);
+
+  box-shadow:
+    0 0 18px rgba(229,9,20,.5);
+}
+
+div[role="radiogroup"]
+label > div:first-child {
+  display: none;
+}
+
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+.stTextInput input,
+.stTextArea textarea,
+.stSelectbox div[data-baseweb="select"] > div {
+
+  background: rgba(255,255,255,.05) !important;
+  color: #fff !important;
+
+  border: 1px solid var(--line) !important;
+  border-radius: 12px !important;
+
+  backdrop-filter: blur(6px);
+}
+
+.stTextInput input:focus,
+.stTextArea textarea:focus {
+
+  border-color: var(--gold) !important;
+
+  box-shadow:
+    0 0 0 2px rgba(245,197,24,.25) !important;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.stButton > button {
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--red),
+      #8a0710
+    );
+
+  color: #fff;
+
+  border:
+    1px solid rgba(245,197,24,.35);
+
+  border-radius: 12px;
+
+  font-weight: 600;
+  letter-spacing: .06em;
+
+  padding: .55rem 1.4rem;
+
+  transition: .2s;
+}
+
+.stButton > button:hover {
+
+  transform: translateY(-2px);
+
+  border-color: var(--gold);
+
+  color: #fff;
+
+  box-shadow:
+    0 8px 26px rgba(229,9,20,.5);
+}
+
+
+/* =========================================================
+   REVIEW TICKET
+   ========================================================= */
+
+.ticket {
+
+  position: relative;
+
+  margin-top: 1rem;
+
+  padding:
+    1.6rem
+    1.8rem
+    1.4rem;
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      160deg,
+      rgba(255,255,255,.07),
+      rgba(255,255,255,.02)
+    );
+
+  border: 1px solid var(--line);
+
+  backdrop-filter: blur(10px);
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.55);
+}
+
+.ticket:before,
+.ticket:after {
+
+  content: "";
+
+  position: absolute;
+
+  top: 58px;
+
+  width: 22px;
+  height: 22px;
+
+  background: var(--bg);
+
+  border-radius: 50%;
+
+  border: 1px solid var(--line);
+}
+
+.ticket:before {
+  left: -12px;
+}
+
+.ticket:after {
+  right: -12px;
+}
+
+.ticket h2 {
+
+  font-family: 'Bebas Neue', sans-serif;
+
+  font-size: 2.4rem;
+
+  letter-spacing: .08em;
+
+  margin: 0;
+
+  color: #fff;
+}
+
+.ticket .sub {
+
+  color: var(--gold);
+
+  font-size: .72rem;
+
+  letter-spacing: .3em;
+
+  text-transform: uppercase;
+}
+
+.ticket hr {
+
+  border: none;
+
+  border-top:
+    2px dashed rgba(255,255,255,.15);
+
+  margin:
+    .9rem 0 1rem;
+}
+
+.ticket ul {
+
+  list-style: none;
+
+  padding: 0;
+  margin: 0;
+}
+
+.ticket li {
+
+  padding:
+    .45rem
+    0
+    .45rem
+    2rem;
+
+  position: relative;
+
+  font-size: 1.02rem;
+
+  line-height: 1.55;
+
+  color: #e6e6ec;
+}
+
+.ticket li:before {
+
+  content: "🎞️";
+
+  position: absolute;
+
+  left: 0;
+  top: .4rem;
+}
+
+.wc {
+
+  margin-top: .8rem;
+
+  color: #777;
+
+  font-size: .75rem;
+
+  text-align: right;
+
+  letter-spacing: .1em;
+}
+
+
+/* =========================================================
+   MOVIE CARDS
+   ========================================================= */
+
+.mcard {
+
+  border-radius: 16px;
+
+  overflow: hidden;
+
+  background: var(--card);
+
+  border: 1px solid var(--line);
+
+  transition: .25s;
+
+  height: 100%;
+}
+
+.mcard:hover {
+
+  transform: translateY(-6px);
+
+  border-color: var(--gold);
+
+  box-shadow:
+    0 18px 44px rgba(0,0,0,.6);
+}
+
+.poster {
+
+  height: 120px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-family: 'Bebas Neue', sans-serif;
+
+  font-size: 3.6rem;
+
+  color: rgba(255,255,255,.9);
+
+  letter-spacing: .05em;
+
+  text-shadow:
+    0 4px 20px rgba(0,0,0,.5);
+}
+
+.mbody {
+
+  padding:
+    .9rem
+    1.1rem
+    .6rem;
+}
+
+.mbody h3 {
+
+  font-family: 'Bebas Neue', sans-serif;
+
+  font-size: 1.55rem;
+
+  letter-spacing: .05em;
+
+  margin: 0;
+
+  color: #fff;
+}
+
+.year {
+
+  color: var(--gold);
+
+  font-size: .78rem;
+
+  letter-spacing: .15em;
+
+  margin-bottom: .5rem;
+}
+
+.pill {
+
+  display: inline-block;
+
+  background:
+    rgba(245,197,24,.1);
+
+  color: var(--gold);
+
+  border:
+    1px solid rgba(245,197,24,.3);
+
+  border-radius: 999px;
+
+  padding:
+    .05rem .6rem;
+
+  font-size: .68rem;
+
+  margin:
+    0 .25rem .25rem 0;
+}
+
+.why {
+
+  color: #c9c9d2;
+
+  font-size: .88rem;
+
+  line-height: 1.5;
+
+  margin-top: .4rem;
+}
+
+.sec {
+
+  font-family: 'Bebas Neue', sans-serif;
+
+  letter-spacing: .15em;
+
+  font-size: 1.7rem;
+
+  color: var(--gold);
+
+  margin:
+    1.2rem 0 .6rem;
+}
+
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+section[data-testid="stSidebar"] {
+
+  background:
+    rgba(10,10,15,.97);
+
+  border-right:
+    1px solid var(--line);
+}
+
+
+/* Sidebar text */
+
+section[data-testid="stSidebar"] * {
+
+  color: #eee;
+}
+
+
+/* Sidebar inputs */
+
+section[data-testid="stSidebar"]
+.stTextInput input {
+
+  background:
+    rgba(255,255,255,.06) !important;
+
+  color: #fff !important;
+
+  border:
+    1px solid rgba(255,255,255,.12) !important;
+}
+
+
+/* =========================================================
+   SIDEBAR TOGGLE BUTTON
+   ========================================================= */
+
+/*
+   Streamlit's native sidebar toggle button.
+
+   We keep it visible and make it easier to see.
+*/
+
+button[data-testid="stSidebarCollapsedControl"] {
+
+  display: flex !important;
+
+  visibility: visible !important;
+
+  opacity: 1 !important;
+
+  position: fixed !important;
+
+  top: 12px !important;
+  left: 12px !important;
+
+  z-index: 999999 !important;
+
+  width: 42px !important;
+  height: 42px !important;
+
+  border-radius: 12px !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--red),
+      #8a0710
+    ) !important;
+
+  border:
+    1px solid var(--gold) !important;
+
+  box-shadow:
+    0 4px 20px rgba(229,9,20,.45) !important;
+}
+
+
+/* Icon inside toggle */
+
+button[data-testid="stSidebarCollapsedControl"]
+svg {
+
+  width: 22px !important;
+  height: 22px !important;
+
+  color: #fff !important;
+}
+
+
+/* Sidebar open-state control */
+
+button[data-testid="stSidebarCollapseButton"] {
+
+  z-index: 999999 !important;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status {
+
+  padding: .4rem .8rem;
+
+  border-radius: 10px;
+
+  font-size: .8rem;
+
+  margin:
+    .3rem 0 .6rem;
+}
+
+.ok {
+
+  background:
+    rgba(46,160,67,.15);
+
+  color: #56d364;
+
+  border:
+    1px solid rgba(46,160,67,.4);
+}
+
+.no {
+
+  background:
+    rgba(229,9,20,.12);
+
+  color: #ff7b72;
+
+  border:
+    1px solid rgba(229,9,20,.4);
+}
+
+
+/* =========================================================
+   MOBILE RESPONSIVE DESIGN
+   ========================================================= */
+
 @media (max-width: 768px) {
-  section[data-testid="stSidebar"] {
-    min-width: 280px;
-    max-width: 85vw;
+
+  .block-container {
+
+    padding:
+      1rem .8rem 2rem;
+
+    max-width: 100%;
   }
+
+  .title {
+
+    font-size: 3.2rem;
+
+    letter-spacing: .12em;
+  }
+
+  .tag {
+
+    font-size: .6rem;
+
+    letter-spacing: .25em;
+  }
+
+  .hero {
+
+    padding-top: 2.5rem;
+  }
+
+  .strip {
+
+    max-width: 90%;
+  }
+
+  .ticket {
+
+    padding:
+      1.2rem 1rem 1rem;
+  }
+
+  .ticket h2 {
+
+    font-size: 2rem;
+  }
+
+  .ticket li {
+
+    font-size: .92rem;
+
+    padding-left: 1.8rem;
+  }
+
+  .poster {
+
+    height: 100px;
+
+    font-size: 2.8rem;
+  }
+
+  /* Keep sidebar toggle clearly visible */
+
+  button[data-testid="stSidebarCollapsedControl"] {
+
+    top: 10px !important;
+    left: 10px !important;
+
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+  .title {
+
+    font-size: 2.7rem;
+  }
+
+  .tag {
+
+    font-size: .55rem;
+  }
+
+  div[role="radiogroup"] {
+
+    flex-wrap: wrap;
+
+    gap: .4rem;
+  }
+
+  div[role="radiogroup"] label {
+
+    padding:
+      .3rem .8rem;
+
+    font-size: .8rem;
+  }
+
 }
