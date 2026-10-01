@@ -76,3 +76,10 @@ section[data-testid="stSidebar"]{background:rgba(10,10,15,.95);border-right:1px 
 .status{padding:.4rem .8rem;border-radius:10px;font-size:.8rem;margin:.3rem 0 .6rem;}
 .ok{background:rgba(46,160,67,.15);color:#56d364;border:1px solid rgba(46,160,67,.4);}
 .no{background:rgba(229,9,20,.12);color:#ff7b72;border:1px solid rgba(229,9,20,.4);}
+/* Make sidebar easier to access on mobile */
+@media (max-width: 768px) {
+  section[data-testid="stSidebar"] {
+    min-width: 280px;
+    max-width: 85vw;
+  }
+}
