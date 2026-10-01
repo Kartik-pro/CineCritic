@@ -1,0 +1,7 @@
+streamlit
+python-dotenv
+pydantic
+langchain
+langchain-core
+langchain-mistralai
+langchain-google-genai
