@@ -1,0 +1,19 @@
+# Secrets
+.env.example
+
+#Github_Stuff
+LICENSE
+README.md
+requirements.txt
+
+# Local credentials (CINECRITIC_LOCAL_MODE)
+.cinecritic/
+
+# Local data (CINECRITIC_DATA_FILE) and secrets
+.cinecritic/
+.streamlit/secrets.toml
+*.db
+__pycache__/
+*.pyc
+.pytest_cache/
+*.sqlite*
