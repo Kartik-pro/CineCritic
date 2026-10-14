@@ -379,3 +379,711 @@ div[role="dialog"] [data-baseweb="tab-highlight"] { background: var(--gold); }
   .st-key-chips [data-testid="stColumn"] { min-width: 0 !important; }
   .block-container { padding-left: 14px !important; padding-right: 14px !important; }
 }
+
+/* ==========================================================
+   CINECRITIC 3.0 — RESPONSIVE LAYOUT SYSTEM
+   Add at the VERY END of cinecritic/ui/style.css
+   Keeps the existing Cinema Noir theme and page components.
+   ========================================================== */
+
+/* ---------- Global sizing and overflow protection ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+body,
+.stApp,
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"],
+[data-testid="stMainBlockContainer"] {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+img,
+video,
+iframe,
+svg {
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+pre,
+code {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+span,
+label,
+a {
+  overflow-wrap: anywhere;
+}
+
+[data-testid="stMainBlockContainer"] {
+  min-width: 0;
+}
+
+.block-container {
+  width: 100%;
+  max-width: 1240px;
+  min-width: 0;
+  margin-inline: auto;
+}
+
+/* Allow Streamlit's nested blocks to shrink */
+[data-testid="stVerticalBlock"],
+[data-testid="stHorizontalBlock"],
+[data-testid="stColumn"],
+[data-testid="stElementContainer"],
+[data-testid="stMarkdownContainer"] {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* ---------- Buttons: prevent overlap and clipping ---------- */
+
+.stButton,
+.stDownloadButton,
+[data-testid="stButton"],
+[data-testid="stDownloadButton"],
+[data-testid="stFormSubmitButton"],
+[data-testid="stLinkButton"] {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.stButton button,
+.stDownloadButton button,
+[data-testid="stFormSubmitButton"] button,
+[data-testid="stLinkButton"] a,
+button[kind] {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.35;
+}
+
+/* Prevent button labels from forcing wider columns */
+.stButton button p,
+.stDownloadButton button p,
+[data-testid="stFormSubmitButton"] button p {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Search forms ---------- */
+
+.st-key-hero_search,
+.st-key-hero_search [data-testid="stForm"] {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.st-key-hero_search [data-testid="stHorizontalBlock"] {
+  min-width: 0;
+  align-items: stretch;
+}
+
+.st-key-hero_search input,
+.st-key-hero_search textarea,
+.st-key-hero_search [data-baseweb="input"],
+.st-key-hero_search [data-baseweb="base-input"] {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* ---------- Tabs and segmented controls ---------- */
+
+[data-baseweb="tab-list"] {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+[data-baseweb="tab"] {
+  flex-shrink: 0;
+}
+
+[data-testid="stRadio"],
+[data-testid="stCheckbox"],
+[data-testid="stSelectbox"],
+[data-testid="stMultiSelect"],
+[data-testid="stTextInput"],
+[data-testid="stTextArea"],
+[data-testid="stNumberInput"],
+[data-testid="stDateInput"],
+[data-testid="stFileUploader"],
+[data-testid="stSlider"] {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* ---------- Tables and charts ---------- */
+
+[data-testid="stDataFrame"],
+[data-testid="stTable"],
+[data-testid="stPlotlyChart"],
+[data-testid="stVegaLiteChart"],
+[data-testid="stArrowVegaLiteChart"] {
+  max-width: 100%;
+  min-width: 0;
+}
+
+[data-testid="stDataFrame"] > div,
+[data-testid="stPlotlyChart"] > div {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.tscroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ntable {
+  max-width: 100%;
+}
+
+/* ---------- Dialogs and popovers ---------- */
+
+[data-testid="stPopover"],
+[data-testid="stPopoverBody"],
+[data-testid="stDialog"],
+div[role="dialog"] {
+  min-width: 0;
+  max-width: 100%;
+}
+
+[data-testid="stPopoverBody"] {
+  overflow-wrap: anywhere;
+}
+
+[data-testid="stSidebar"] {
+  min-width: 0;
+}
+
+[data-testid="stSidebarNav"] a {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Tablets: 768px–1024px ---------- */
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .block-container {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+
+  .hero h1 {
+    font-size: clamp(42px, 6vw, 64px);
+    line-height: 1.05;
+  }
+
+  .grid3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .pillars {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .featured .feat-img {
+    gap: 16px;
+  }
+
+  .feat-title {
+    font-size: clamp(36px, 5vw, 58px);
+  }
+
+  .dim,
+  .tile,
+  .dossier {
+    min-width: 0;
+    padding: 16px;
+  }
+
+  .stButton button,
+  .stDownloadButton button {
+    max-width: 100%;
+  }
+}
+
+/* ---------- Phones: 767px and below ---------- */
+
+@media (max-width: 767px) {
+
+  /* Page gutters */
+  .block-container {
+    padding: 0 14px 4rem !important;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Wrap ordinary rows to avoid overlapping columns */
+  [data-testid="stHorizontalBlock"] {
+    flex-wrap: wrap !important;
+    align-items: stretch;
+    gap: 12px !important;
+    min-width: 0;
+  }
+
+  [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  [data-testid="stVerticalBlock"] {
+    gap: 12px;
+  }
+
+  /* Full-width controls prevent narrow, colliding buttons */
+  .stButton,
+  .stDownloadButton,
+  [data-testid="stFormSubmitButton"],
+  [data-testid="stLinkButton"] {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .stButton button,
+  .stDownloadButton button,
+  [data-testid="stFormSubmitButton"] button,
+  [data-testid="stLinkButton"] a {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: center;
+  }
+
+  /* Search: input above button */
+  .st-key-hero_search [data-testid="stHorizontalBlock"] {
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    gap: 10px !important;
+  }
+
+  .st-key-hero_search [data-testid="stColumn"] {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .st-key-hero_search [data-testid="stForm"] {
+    padding: 10px;
+  }
+
+  .st-key-hero_search input,
+  .st-key-hero_search textarea {
+    font-size: 16px !important;
+  }
+
+  /* Hero typography */
+  .hero {
+    padding-top: 30px;
+    padding-bottom: 18px;
+  }
+
+  .hero h1 {
+    font-size: clamp(36px, 10vw, 48px);
+    line-height: 1.02;
+    overflow-wrap: anywhere;
+  }
+
+  .hero p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .nhero {
+    padding: 22px 16px;
+  }
+
+  .nhero h1 {
+    font-size: clamp(34px, 9vw, 46px);
+    line-height: 1.03;
+  }
+
+  .nhero p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .page-head h1 {
+    font-size: clamp(30px, 8vw, 40px);
+    line-height: 1.08;
+  }
+
+  .sec-title {
+    font-size: 26px;
+    line-height: 1.12;
+    margin-bottom: 14px;
+  }
+
+  .eyebrow {
+    margin-top: 26px;
+  }
+
+  /* Critique cards */
+  .grid3 {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .dim,
+  .tile,
+  .dossier,
+  .verdict,
+  .ticket,
+  .pipe {
+    min-width: 0;
+    max-width: 100%;
+    padding: 16px;
+  }
+
+  .dim header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .dim h3 {
+    min-width: 0;
+    font-size: 19px;
+  }
+
+  .dim header b {
+    font-size: 28px;
+  }
+
+  .verdict h2 {
+    font-size: clamp(30px, 8vw, 40px);
+  }
+
+  .verdict blockquote {
+    font-size: 15px;
+    line-height: 1.6;
+    padding-left: 12px;
+  }
+
+  /* Featured film */
+  .feat-img {
+    min-height: 340px;
+    padding: 18px;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-end;
+    gap: 16px;
+  }
+
+  .feat-title {
+    font-size: clamp(34px, 9vw, 46px);
+    line-height: 1.04;
+  }
+
+  .score {
+    flex-wrap: wrap;
+    align-self: stretch;
+    max-width: 100%;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .score-ring {
+    flex-shrink: 0;
+  }
+
+  .pull {
+    padding: 14px 16px;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .credits {
+    gap: 10px 18px;
+  }
+
+  /* Compact dashboard grids */
+  .pillars {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .stats2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .consensus {
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .consensus .big {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .consensus .big b {
+    font-size: 48px;
+  }
+
+  .arch {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .arch h3 {
+    min-width: 0;
+  }
+
+  .foot {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    margin-top: 40px;
+  }
+
+  /* Genre chips: wrap, do not stretch across the whole screen */
+  .st-key-chips [data-testid="stHorizontalBlock"] {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: center;
+    gap: 8px !important;
+  }
+
+  .st-key-chips [data-testid="stColumn"] {
+    flex: 0 1 auto !important;
+    width: auto !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .st-key-chips .stButton {
+    width: auto;
+  }
+
+  .st-key-chips .stButton button {
+    width: auto;
+    min-height: 36px;
+    padding: 6px 12px;
+  }
+
+  /* Poster rail: keep intentional horizontal scrolling */
+  .st-key-rail [data-testid="stHorizontalBlock"] {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch;
+    gap: 12px !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px 2px 12px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
+  .st-key-rail [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+    flex: 0 0 68% !important;
+    width: 68% !important;
+    max-width: 68% !important;
+    min-width: 0 !important;
+    scroll-snap-align: start;
+  }
+
+  /* Buttons in a poster card should fit that card */
+  .st-key-rail .stButton {
+    width: 100%;
+  }
+
+  .st-key-rail .stButton button {
+    width: 100%;
+    min-height: 40px;
+    text-align: left;
+  }
+
+  /* Pipeline stages: stack vertically */
+  .pipe-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-left: 4px;
+  }
+
+  .stg {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .stg:not(:last-child)::after {
+    display: block;
+    top: auto;
+    bottom: -15px;
+    left: 23px;
+    right: auto;
+    width: 2px;
+    height: 14px;
+  }
+
+  /* Dialogs: fit the visible screen */
+  [data-testid="stDialog"] > div,
+  div[role="dialog"] {
+    box-sizing: border-box;
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    max-height: 90dvh;
+    margin: 0 auto !important;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-radius: 8px !important;
+  }
+
+  div[role="dialog"] [data-testid="stHorizontalBlock"] {
+    flex-wrap: wrap !important;
+  }
+
+  div[role="dialog"] [data-testid="stColumn"] {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Tabs remain horizontally scrollable in dialogs */
+  div[role="dialog"] [data-baseweb="tab-list"] {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  /* Metrics */
+  [data-testid="stMetric"] {
+    min-width: 0;
+    padding: 10px;
+  }
+
+  [data-testid="stMetricValue"] {
+    font-size: clamp(20px, 6vw, 28px);
+    overflow-wrap: anywhere;
+  }
+
+  /* Form fields */
+  input,
+  textarea,
+  select {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  /* Smaller margins on mobile */
+  .featured {
+    margin-top: 20px;
+  }
+
+  .empty {
+    margin: 24px auto;
+    padding: 24px 16px;
+  }
+
+  .foot {
+    padding-top: 22px;
+  }
+}
+
+/* ---------- Very narrow phones: 320px–374px ---------- */
+
+@media (max-width: 374px) {
+  .block-container {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .hero h1 {
+    font-size: 34px;
+  }
+
+  .nhero h1 {
+    font-size: 32px;
+  }
+
+  .feat-title {
+    font-size: 32px;
+  }
+
+  .dim,
+  .tile,
+  .dossier,
+  .verdict,
+  .pipe {
+    padding: 12px;
+  }
+
+  .st-key-rail [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+    flex-basis: 78% !important;
+    width: 78% !important;
+    max-width: 78% !important;
+  }
+
+  .stats2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- Wide desktop ---------- */
+
+@media (min-width: 1200px) {
+  .grid3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Accessibility ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
