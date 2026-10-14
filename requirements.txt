@@ -1,0 +1,14 @@
+# Ranges, not exact pins: exact versions could not be verified against PyPI from the build environment.
+# After your first successful Community Cloud build, freeze what it installed (pip freeze) and pin it here.
+streamlit>=1.46,<2
+python-dotenv>=1.0,<2
+pydantic>=2.5,<3
+requests>=2.31,<3
+networkx>=3.2,<4
+reportlab>=4.0,<5
+langchain>=0.3,<2
+langchain-core>=0.3,<2
+langchain-google-genai>=2.0
+langchain-openai>=0.2
+langchain-anthropic>=0.3
+langchain-mistralai>=0.2
