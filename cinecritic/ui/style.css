@@ -21,8 +21,34 @@ html, body, .stApp { background: var(--bg) !important; color: var(--text); font-
     radial-gradient(ellipse 60% 40% at 50% 0%, rgba(198, 161, 91, 0.06), transparent 70%),
     var(--bg) !important;
 }
-[data-testid="stToolbar"], [data-testid="stDecoration"], #MainMenu, footer:not(.foot) { display: none !important; }
-[data-testid="stHeader"] { background: transparent !important; }   /* keeps the mobile sidebar toggle reachable */
+ [data-testid="stDecoration"],
+#MainMenu,
+footer:not(.foot) {
+    display: none !important;
+}
+/* Keep Streamlit's native mobile navigation reachable */
+[data-testid="stHeader"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: var(--bg) !important;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+[data-testid="stToolbar"] {
+    visibility: visible !important;
+}
+
+/* Preserve a visible, tappable sidebar toggle */
+[data-testid="stSidebarCollapsedControl"],
+[data-testid="stSidebarCollapsedControl"] button,
+button[kind="header"] {
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}/* keeps the mobile sidebar toggle reachable */
 .block-container { max-width: 1240px; padding: 0 clamp(16px, 3vw, 48px) 5rem !important; }
 [data-testid="stVerticalBlock"] { gap: 0.75rem; }
 h1, h2, h3, h4, p { margin: 0; }
@@ -1085,5 +1111,64 @@ div[role="dialog"] {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Home search form */
+@media (max-width: 767px) {
+  .st-key-hero_search [data-testid="stHorizontalBlock"] {
+    display: flex;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    gap: 10px !important;
+  }
+
+  .st-key-hero_search
+  [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .st-key-hero_search [data-testid="stFormSubmitButton"] {
+    width: 100%;
+  }
+
+  /* Keep inputs inside their own containers */
+  .st-key-hero_search input {
+    width: 100%;
+    min-width: 0;
+    font-size: 16px !important;
+  }
+
+  /* Smart Movie Search: title and year stack cleanly.
+     The Search button gets its own row. */
+  .st-key-search_form
+  [data-testid="stHorizontalBlock"] {
+    display: flex;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+
+  .st-key-search_form
+  [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .st-key-search_form input {
+    width: 100%;
+    min-width: 0;
+    font-size: 16px !important;
+  }
+
+  .st-key-search_form
+  [data-testid="stFormSubmitButton"] button {
+    width: 100%;
+    min-height: 44px;
+    white-space: normal;
   }
 }
