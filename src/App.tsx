@@ -1,3 +1,4 @@
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { LANGUAGES, SPOILER_LABELS, SPOILER_LEVELS, type SpoilerLevel } from "../shared/types";
 import { Ask } from "./pages/Ask";
 import { Battle } from "./pages/Battle";
@@ -72,6 +73,7 @@ export default function App() {
   return (
     <AppProvider>
       <Shell />
+      <SpeedInsights />
     </AppProvider>
   );
 }
