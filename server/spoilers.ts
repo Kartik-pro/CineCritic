@@ -1,5 +1,5 @@
-import type { Critique, SpoilerLevel } from "../shared/types";
-import { DIMENSIONS, SPOILER_LEVELS } from "../shared/types";
+import type { Critique, SpoilerLevel } from "../shared/types.js";
+import { DIMENSIONS, SPOILER_LEVELS } from "../shared/types.js";
 
 const PLACEHOLDER = "Details withheld to avoid spoilers.";
 

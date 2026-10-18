@@ -1,9 +1,9 @@
-import { DIMENSIONS, type Critique, type Dimension, type DimensionKey, type MovieDetails, type SpoilerLevel } from "../shared/types";
-import { validScore } from "../shared/scoring";
-import { generateJson } from "./ai";
-import { QUICK_TAKE_WORDS, critiqueSystem } from "./prompts";
-import { enforce } from "./spoilers";
-import { facts } from "./tmdb";
+import { DIMENSIONS, type Critique, type Dimension, type DimensionKey, type MovieDetails, type SpoilerLevel } from "../shared/types.js";
+import { validScore } from "../shared/scoring.js";
+import { generateJson } from "./ai.js";
+import { QUICK_TAKE_WORDS, critiqueSystem } from "./prompts.js";
+import { enforce } from "./spoilers.js";
+import { facts } from "./tmdb.js";
 
 const text = (value: unknown, max = 400): string => (typeof value === "string" ? value.trim().slice(0, max) : "");
 

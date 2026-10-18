@@ -1,6 +1,6 @@
-import { DIMENSIONS, type Analysis, type SpoilerLevel } from "../shared/types";
-import { dimensionScores, type Comparison } from "../shared/scoring";
-import { facts } from "./tmdb";
+import { DIMENSIONS, type Analysis, type SpoilerLevel } from "../shared/types.js";
+import { dimensionScores, type Comparison } from "../shared/scoring.js";
+import { facts } from "./tmdb.js";
 
 export function isAnalysis(value: unknown): value is Analysis {
   const a = value as Analysis | null;

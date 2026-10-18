@@ -1,5 +1,5 @@
-import { DIMENSIONS, type SpoilerLevel } from "../shared/types";
-import { spoilerInstructions } from "./spoilers";
+import { DIMENSIONS, type SpoilerLevel } from "../shared/types.js";
+import { spoilerInstructions } from "./spoilers.js";
 
 export const QUICK_TAKE_WORDS = 50;
 

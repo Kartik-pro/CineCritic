@@ -1,6 +1,6 @@
-import type { ChatMessage } from "../shared/types";
-import { HttpError } from "./http";
-import { requestKeys } from "./keys";
+import type { ChatMessage } from "../shared/types.js";
+import { HttpError } from "./http.js";
+import { requestKeys } from "./keys.js";
 
 type Provider = "anthropic" | "openai" | "gemini" | "mistral";
 

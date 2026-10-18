@@ -1,6 +1,6 @@
-import { LANGUAGES, type SpoilerLevel } from "../shared/types";
-import { readKeys, withKeys } from "./keys";
-import { effectiveLevel } from "./spoilers";
+import { LANGUAGES, type SpoilerLevel } from "../shared/types.js";
+import { readKeys, withKeys } from "./keys.js";
+import { effectiveLevel } from "./spoilers.js";
 
 export class HttpError extends Error {
   constructor(

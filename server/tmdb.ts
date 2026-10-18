@@ -1,6 +1,6 @@
-import type { ListKind, Movie, MovieDetails, MovieListResponse } from "../shared/types";
-import { HttpError } from "./http";
-import { requestKeys } from "./keys";
+import type { ListKind, Movie, MovieDetails, MovieListResponse } from "../shared/types.js";
+import { HttpError } from "./http.js";
+import { requestKeys } from "./keys.js";
 
 const API = "https://api.themoviedb.org/3";
 const IMAGE = "https://image.tmdb.org/t/p";
