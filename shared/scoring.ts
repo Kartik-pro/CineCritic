@@ -1,4 +1,4 @@
-import { DIMENSIONS, type Critique, type DimensionKey } from "./types";
+import { DIMENSIONS, type Critique, type DimensionKey } from "./types.js";
 
 export type Scores = Record<DimensionKey, number | null>;
 
