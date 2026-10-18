@@ -1,5 +1,6 @@
 import type { ChatMessage } from "../shared/types";
 import { HttpError } from "./http";
+import { requestKeys } from "./keys";
 
 type Provider = "anthropic" | "openai" | "gemini" | "mistral";
 
@@ -21,7 +22,17 @@ export interface GenerateOptions {
   json?: boolean;
 }
 
+export function hasServerAiKey(): boolean {
+  return (Object.keys(PROVIDERS) as Provider[]).some((p) => !!process.env[PROVIDERS[p].env]?.trim());
+}
+
 function configured(): { provider: Provider; key: string; model: string } {
+  const sent = requestKeys();
+  if (sent.ai) {
+    if (!(sent.provider in PROVIDERS)) throw new HttpError(400, "Choose an AI provider in Settings.");
+    const provider = sent.provider as Provider;
+    return { provider, key: sent.ai, model: sent.model || PROVIDERS[provider].model };
+  }
   const requested = process.env.AI_PROVIDER?.trim().toLowerCase();
   const order = Object.keys(PROVIDERS) as Provider[];
   const candidates = requested && requested in PROVIDERS ? [requested as Provider] : order;
@@ -29,7 +40,7 @@ function configured(): { provider: Provider; key: string; model: string } {
     const key = process.env[PROVIDERS[provider].env]?.trim();
     if (key) return { provider, key, model: process.env.AI_MODEL?.trim() || PROVIDERS[provider].model };
   }
-  throw new HttpError(500, "No AI provider key is configured on the server.");
+  throw new HttpError(401, "Add an AI API key in Settings to continue.");
 }
 
 async function send(url: string, headers: Record<string, string>, body: unknown): Promise<any> {
@@ -42,12 +53,12 @@ async function send(url: string, headers: Record<string, string>, body: unknown)
       signal: AbortSignal.timeout(50_000),
     });
   } catch {
-    throw new HttpError(503, "The AI provider did not respond in time. Please try again.");
+    throw new HttpError(504, "The AI provider did not respond in time. Please try again.");
   }
   if (response.ok) return response.json();
   if (response.status === 401 || response.status === 403)
-    throw new HttpError(500, "The AI provider rejected the server's API key.");
-  if (response.status === 404) throw new HttpError(500, "The configured AI model was not found.");
+    throw new HttpError(401, "The AI provider rejected the API key. Check it in Settings.");
+  if (response.status === 404) throw new HttpError(400, "That AI model was not found. Check the model name in Settings.");
   if (response.status === 429) throw new HttpError(429, "The AI provider is rate-limiting requests. Try again shortly.");
   throw new HttpError(503, "The AI provider is temporarily unavailable. Please try again.");
 }

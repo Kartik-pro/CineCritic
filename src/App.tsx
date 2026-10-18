@@ -3,11 +3,13 @@ import { Ask } from "./pages/Ask";
 import { Battle } from "./pages/Battle";
 import { Critique } from "./pages/Critique";
 import { Discover } from "./pages/Discover";
+import { Settings } from "./pages/Settings";
 import { Watchlist } from "./pages/Watchlist";
 import { AppProvider, PAGES, useApp } from "./state";
 
 function Shell() {
-  const { page, go, prefs, setPrefs, watchlist } = useApp();
+  const { page, go, prefs, setPrefs, watchlist, available } = useApp();
+  const needsKeys = available !== null && (!available.tmdb || !available.ai);
   const saved = Object.keys(watchlist).length;
 
   return (
@@ -43,7 +45,16 @@ function Shell() {
           </select>
         </div>
       </header>
+      {needsKeys && page !== "settings" && (
+        <p className="banner" role="status">
+          Add your TMDB and AI API keys to get started.{" "}
+          <button className="link" onClick={() => go("settings")}>
+            Open Settings
+          </button>
+        </p>
+      )}
       <main>
+        {page === "settings" && <Settings />}
         {page === "critique" && <Critique />}
         {page === "discover" && <Discover />}
         {page === "ask" && <Ask />}

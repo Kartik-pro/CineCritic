@@ -1,5 +1,6 @@
 import type { ListKind, Movie, MovieDetails, MovieListResponse } from "../shared/types";
 import { HttpError } from "./http";
+import { requestKeys } from "./keys";
 
 const API = "https://api.themoviedb.org/3";
 const IMAGE = "https://image.tmdb.org/t/p";
@@ -7,8 +8,8 @@ const IMAGE = "https://image.tmdb.org/t/p";
 type Raw = Record<string, any>;
 
 async function tmdb(path: string, params: Record<string, string | number> = {}): Promise<Raw> {
-  const key = process.env.TMDB_API_KEY?.trim();
-  if (!key) throw new HttpError(500, "TMDB_API_KEY is not configured on the server.");
+  const key = requestKeys().tmdb || process.env.TMDB_API_KEY?.trim();
+  if (!key) throw new HttpError(401, "Add your TMDB API key in Settings to continue.");
   const url = new URL(API + path);
   const headers: Record<string, string> = {};
   if (key.startsWith("eyJ")) headers.Authorization = `Bearer ${key}`;
@@ -21,7 +22,7 @@ async function tmdb(path: string, params: Record<string, string | number> = {}):
   } catch {
     throw new HttpError(502, "Could not reach TMDB. Please try again.");
   }
-  if (response.status === 401) throw new HttpError(500, "The TMDB API key was rejected.");
+  if (response.status === 401) throw new HttpError(401, "TMDB rejected the API key. Check it in Settings.");
   if (response.status === 404) throw new HttpError(404, "Film not found on TMDB.");
   if (response.status === 429) throw new HttpError(429, "TMDB is rate-limiting requests. Try again shortly.");
   if (!response.ok) throw new HttpError(502, "TMDB returned an error. Please try again.");

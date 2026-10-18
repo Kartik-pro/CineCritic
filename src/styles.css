@@ -45,7 +45,7 @@ nav { display: flex; gap: 4px; overflow-x: auto; flex: 1; min-width: 0; }
 .count { margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: var(--burgundy); color: var(--text); font-size: 11px; }
 .prefs { display: flex; gap: 8px; }
 
-select, input[type="text"], input[type="number"], input[type="search"], textarea {
+select, input[type="text"], input[type="number"], input[type="search"], input[type="password"], textarea {
   background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 9px 12px; min-width: 0;
 }
 textarea { width: 100%; resize: vertical; }
@@ -60,6 +60,13 @@ label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color:
 button:disabled { opacity: 0.5; cursor: not-allowed; }
 .link { background: none; border: 0; padding: 0 6px 0 0; color: var(--gold); text-decoration: underline; }
 .center { display: block; margin: 24px auto 0; }
+
+.banner { margin: 0; padding: 10px 16px; text-align: center; background: var(--surface); border-bottom: 1px solid var(--border); border-left: 3px solid var(--gold); }
+.settings { max-width: 560px; margin: 24px auto; display: grid; gap: 18px; padding: 24px; }
+.settings h2 { margin: 4px 0 8px; font: 400 36px/1 var(--display); letter-spacing: 0.03em; }
+.settings label a { color: var(--gold); }
+.settings .check { flex-direction: row; align-items: center; gap: 8px; }
+.settings .row { display: flex; flex-wrap: wrap; gap: 10px; }
 
 .hero { text-align: center; padding: clamp(24px, 6vw, 56px) 0 24px; }
 .eyebrow { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); font-weight: 700; }

@@ -5,6 +5,7 @@ import { POST as discover } from "../api/discover";
 import { POST as ask } from "../api/ask";
 import { POST as compare } from "../api/compare";
 import { GET as movies } from "../api/movies";
+import { GET as status } from "../api/status";
 import { extractJson } from "../server/ai";
 import { chooseBest, normalizeTitle, parseTitleYear } from "../server/tmdb";
 import { critiqueJson, mockFetch, sampleAnalysis } from "./helpers";
@@ -117,8 +118,37 @@ test("critique errors are friendly", async () => {
   assert.equal((await critique(new Request("http://x", { method: "POST", body: "{{" }))).status, 400);
   delete process.env.ANTHROPIC_API_KEY;
   const res = await critique(post({ id: 1 }));
-  assert.equal(res.status, 500);
-  assert.match(((await res.json()) as any).error, /No AI provider/);
+  assert.equal(res.status, 401);
+  assert.match(((await res.json()) as any).error, /Settings/);
+});
+
+const withKeys = (body: unknown, headers: Record<string, string>) =>
+  new Request("http://x/api", { method: "POST", body: JSON.stringify(body), headers });
+
+test("keys sent from the browser take priority over server variables", async () => {
+  delete process.env.ANTHROPIC_API_KEY;
+  delete process.env.TMDB_API_KEY;
+  const res = await critique(
+    withKeys({ id: 1 }, { "x-tmdb-key": "user-tmdb", "x-ai-provider": "openai", "x-ai-key": "sk-user", "x-ai-model": "gpt-test" }),
+  );
+  assert.equal(res.status, 200);
+  assert.match(aiCalls[0]!.url, /api\.openai\.com/);
+  assert.equal(aiCalls[0]!.headers.authorization, "Bearer sk-user");
+  assert.equal(aiCalls[0]!.body.model, "gpt-test");
+});
+
+test("an unknown provider from the browser is rejected", async () => {
+  const res = await critique(withKeys({ id: 1 }, { "x-ai-provider": "nope", "x-ai-key": "k" }));
+  assert.equal(res.status, 400);
+});
+
+test("status reports which keys are available", async () => {
+  const ask = (headers: Record<string, string> = {}) => status(new Request("http://x/api/status", { headers }));
+  assert.deepEqual(await (await ask()).json(), { tmdb: true, ai: true });
+  delete process.env.TMDB_API_KEY;
+  delete process.env.ANTHROPIC_API_KEY;
+  assert.deepEqual(await (await ask()).json(), { tmdb: false, ai: false });
+  assert.deepEqual(await (await ask({ "x-tmdb-key": "a", "x-ai-key": "b" })).json(), { tmdb: true, ai: true });
 });
 
 test("provider selection: openai, mistral, gemini", async () => {
@@ -156,7 +186,7 @@ test("provider auth failure never leaks the key", async () => {
   restore();
   restore = mockFetch((url) => (url.includes("themoviedb") ? tmdbData(url) : new Response("bad key sk-ant-test", { status: 401 })));
   const res = await critique(post({ id: 1 }));
-  assert.equal(res.status, 500);
+  assert.equal(res.status, 401);
   assert.doesNotMatch(await res.text(), /sk-ant-test/);
 });
 
@@ -214,5 +244,5 @@ test("movies: search, lists and validation", async () => {
   assert.equal(list.totalPages, 3);
   assert.equal((await movies(new Request("http://x/api/movies?list=bogus"))).status, 400);
   delete process.env.TMDB_API_KEY;
-  assert.equal((await movies(new Request("http://x/api/movies?q=Heat"))).status, 500);
+  assert.equal((await movies(new Request("http://x/api/movies?q=Heat"))).status, 401);
 });

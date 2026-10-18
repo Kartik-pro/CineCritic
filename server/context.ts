@@ -45,5 +45,5 @@ export function comparisonContext(a: Analysis, b: Analysis, comparison: Comparis
   const outcomes = comparison.rows
     .map((r) => `${DIMENSIONS.find((d) => d.key === r.key)!.short}: ${r.outcome}`)
     .join(", ");
-  return `${block("A", a)}\n\n${block("B", b)}\n\nSCORE COMPARISON (A vs B): ${outcomes}\nLeader by rule: ${comparison.leader}`;
+  return `${block("A", a)}\n\n${block("B", b)}\n\nSCORE COMPARISON (A vs B): ${outcomes}\nLeader by rule: ${comparison.leader}`.slice(0, 12000);
 }

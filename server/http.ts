@@ -1,4 +1,5 @@
 import { LANGUAGES, type SpoilerLevel } from "../shared/types";
+import { readKeys, withKeys } from "./keys";
 import { effectiveLevel } from "./spoilers";
 
 export class HttpError extends Error {
@@ -17,7 +18,7 @@ export function json(data: unknown, status = 200, headers: Record<string, string
 export function handle(fn: (req: Request) => Promise<Response>) {
   return async (req: Request): Promise<Response> => {
     try {
-      return await fn(req);
+      return await withKeys(readKeys(req), () => fn(req));
     } catch (error) {
       if (error instanceof HttpError) return json({ error: error.message }, error.status);
       console.error(error);

@@ -10,15 +10,16 @@ import {
   type SetStateAction,
 } from "react";
 import type { Analysis, ChatMessage, Movie, SpoilerLevel } from "../shared/types";
-import { api, type Options, type Target } from "./api";
+import { EMPTY_KEYS, api, setApiKeys, type Availability, type Options, type StoredKeys, type Target } from "./api";
 
-export type Page = "critique" | "discover" | "ask" | "battle" | "watchlist";
+export type Page = "critique" | "discover" | "ask" | "battle" | "watchlist" | "settings";
 export const PAGES: { id: Page; label: string }[] = [
   { id: "critique", label: "Critique" },
   { id: "discover", label: "Discover" },
   { id: "ask", label: "Ask" },
   { id: "battle", label: "Battle" },
   { id: "watchlist", label: "Watchlist" },
+  { id: "settings", label: "Settings" },
 ];
 
 export type Status = "planned" | "watching" | "watched";
@@ -71,6 +72,9 @@ interface AppState {
   go: (page: Page) => void;
   prefs: Prefs;
   setPrefs: (prefs: Prefs) => void;
+  keys: StoredKeys;
+  setKeys: (keys: StoredKeys) => void;
+  available: Availability | null;
   current: Analysis | null;
   setCurrent: (analysis: Analysis | null) => void;
   history: Analysis[];
@@ -122,11 +126,26 @@ export function parseEntries(value: unknown): Entry[] {
 export function AppProvider({ children }: { children: ReactNode }) {
   const [page, setPage] = useState<Page>(pageFromHash);
   const [prefs, setPrefs] = useStored<Prefs>("cc.prefs", { spoiler: "none" as SpoilerLevel, language: "English" });
+  const [storedKeys, setKeys] = useStored<StoredKeys>("cc.keys", EMPTY_KEYS);
+  const keys = useMemo(() => ({ ...EMPTY_KEYS, ...storedKeys }), [storedKeys]);
+  setApiKeys(keys);
+  const [available, setAvailable] = useState<Availability | null>(null);
   const [history, setHistory] = useStored<Analysis[]>("cc.history", []);
   const [watchlist, setWatchlist] = useStored<Record<number, Entry>>("cc.watchlist", {});
   const [current, setCurrent] = useState<Analysis | null>(null);
   const [pending, setPending] = useState<Target | null>(null);
   const [chat, setChat] = useState<ChatMessage[]>([]);
+
+  useEffect(() => {
+    let live = true;
+    api
+      .status()
+      .then((result) => live && setAvailable(result))
+      .catch(() => live && setAvailable(null));
+    return () => {
+      live = false;
+    };
+  }, [keys]);
 
   useEffect(() => {
     const onHash = () => setPage(pageFromHash());
@@ -211,10 +230,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AppState>(
     () => ({
-      page, go, prefs, setPrefs, current, setCurrent, history, pending, analyze, clearPending, loadAnalysis,
-      watchlist, saveEntry, removeEntry, importEntries, chat, setChat,
+      page, go, prefs, setPrefs, keys, setKeys, available, current, setCurrent, history, pending, analyze, clearPending,
+      loadAnalysis, watchlist, saveEntry, removeEntry, importEntries, chat, setChat,
     }),
-    [page, go, prefs, setPrefs, current, history, pending, analyze, clearPending, loadAnalysis, watchlist, saveEntry, removeEntry, importEntries, chat],
+    [page, go, prefs, setPrefs, keys, setKeys, available, current, history, pending, analyze, clearPending, loadAnalysis, watchlist, saveEntry, removeEntry, importEntries, chat],
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
