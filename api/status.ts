@@ -1,6 +1,6 @@
-import { hasServerAiKey } from "../server/ai";
-import { handle, json } from "../server/http";
-import { requestKeys } from "../server/keys";
+import { hasServerAiKey } from "../server/ai.js";
+import { handle, json } from "../server/http.js";
+import { requestKeys } from "../server/keys.js";
 
 export const GET = handle(async () => {
   const sent = requestKeys();

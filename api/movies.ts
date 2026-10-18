@@ -1,5 +1,5 @@
-import { handle, json, cleanText, HttpError } from "../server/http";
-import { isListKind, listMovies, searchMovies } from "../server/tmdb";
+import { handle, json, cleanText, HttpError } from "../server/http.js";
+import { isListKind, listMovies, searchMovies } from "../server/tmdb.js";
 
 const CACHE = { "cache-control": "public, s-maxage=600, stale-while-revalidate=3600" };
 

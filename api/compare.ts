@@ -1,9 +1,9 @@
-import { handle, json, readBody, readOptions, HttpError } from "../server/http";
-import { generateText } from "../server/ai";
-import { compareSystem } from "../server/prompts";
-import { stripSpoilers } from "../server/spoilers";
-import { comparisonContext, isAnalysis } from "../server/context";
-import { compareScores, dimensionScores } from "../shared/scoring";
+import { handle, json, readBody, readOptions, HttpError } from "../server/http.js";
+import { generateText } from "../server/ai.js";
+import { compareSystem } from "../server/prompts.js";
+import { stripSpoilers } from "../server/spoilers.js";
+import { comparisonContext, isAnalysis } from "../server/context.js";
+import { compareScores, dimensionScores } from "../shared/scoring.js";
 
 export const POST = handle(async (req) => {
   const body = await readBody(req);

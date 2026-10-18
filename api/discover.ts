@@ -1,8 +1,8 @@
-import { handle, json, readBody, cleanText, HttpError } from "../server/http";
-import { generateJson } from "../server/ai";
-import { discoverSystem } from "../server/prompts";
-import { chooseBest, searchMovies } from "../server/tmdb";
-import type { Pick } from "../shared/types";
+import { handle, json, readBody, cleanText, HttpError } from "../server/http.js";
+import { generateJson } from "../server/ai.js";
+import { discoverSystem } from "../server/prompts.js";
+import { chooseBest, searchMovies } from "../server/tmdb.js";
+import type { Pick } from "../shared/types.js";
 
 const COUNT = 6;
 

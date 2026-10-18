@@ -1,9 +1,9 @@
-import { handle, json, readBody, readOptions, cleanText, HttpError } from "../server/http";
-import { generateText } from "../server/ai";
-import { askSystem } from "../server/prompts";
-import { stripSpoilers } from "../server/spoilers";
-import { filmContext, isAnalysis } from "../server/context";
-import type { ChatMessage } from "../shared/types";
+import { handle, json, readBody, readOptions, cleanText, HttpError } from "../server/http.js";
+import { generateText } from "../server/ai.js";
+import { askSystem } from "../server/prompts.js";
+import { stripSpoilers } from "../server/spoilers.js";
+import { filmContext, isAnalysis } from "../server/context.js";
+import type { ChatMessage } from "../shared/types.js";
 
 const HISTORY_LIMIT = 8;
 

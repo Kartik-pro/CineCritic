@@ -1,7 +1,7 @@
-import { handle, json, readBody, readOptions, cleanText, HttpError } from "../server/http";
-import { findMovie, getDetails, getSimilar } from "../server/tmdb";
-import { runCritique } from "../server/critique";
-import type { CritiqueResponse, Movie } from "../shared/types";
+import { handle, json, readBody, readOptions, cleanText, HttpError } from "../server/http.js";
+import { findMovie, getDetails, getSimilar } from "../server/tmdb.js";
+import { runCritique } from "../server/critique.js";
+import type { CritiqueResponse, Movie } from "../shared/types.js";
 
 export const POST = handle(async (req) => {
   const body = await readBody(req);
