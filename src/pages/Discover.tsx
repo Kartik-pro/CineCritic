@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import type { ListKind, Movie, Pick } from "../../shared/types";
 import { api } from "../api";
+import { RunPanel } from "../components/Pipeline";
+import { operations } from "../pipeline/operations";
+import { useRunner } from "../pipeline/useRunner";
 import { MovieCard, MovieGrid } from "../components/MovieCard";
 import { ErrorNote, Loading } from "../components/Status";
 import { useApp } from "../state";
@@ -68,21 +71,14 @@ function Describe() {
   const { analyze } = useApp();
   const [text, setText] = useState("");
   const [picks, setPicks] = useState<Pick[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const runner = useRunner();
 
-  const find = async () => {
-    if (!text.trim() || loading) return;
-    setLoading(true);
-    setError("");
-    try {
-      setPicks((await api.discover(text)).picks);
-    } catch (e) {
-      setPicks([]);
-      setError(e instanceof Error ? e.message : "Could not find films.");
-    } finally {
-      setLoading(false);
-    }
+  const find = async (input = text) => {
+    const value = input.trim();
+    if (!value || runner.busy) return;
+    setPicks([]);
+    const result = await runner.start(operations.discover(value));
+    if (result) setPicks(result.picks);
   };
 
   return (
@@ -97,12 +93,11 @@ function Describe() {
           aria-label="Describe what you want to watch"
           onChange={(e) => setText(e.target.value)}
         />
-        <button className="primary" disabled={loading || !text.trim()} onClick={() => void find()}>
+        <button className="primary" disabled={runner.busy || !text.trim()} onClick={() => void find()}>
           Find films
         </button>
       </div>
-      <ErrorNote message={error} />
-      {loading && <Loading text="Finding films…" />}
+      <RunPanel run={runner.run} onCancel={runner.cancel} onRetry={() => void find(runner.run?.retry?.text ?? text)} />
       <MovieGrid>
         {picks.map((m) => (
           <MovieCard key={m.id} movie={m} note={m.why} onOpen={(movie) => analyze({ id: movie.id })} />

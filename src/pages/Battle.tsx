@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { DIMENSIONS, type Analysis, type Movie } from "../../shared/types";
 import { compareScores, dimensionScores, type Comparison } from "../../shared/scoring";
-import { api } from "../api";
+import { RunPanel } from "../components/Pipeline";
+import { operations } from "../pipeline/operations";
+import { useRunner } from "../pipeline/useRunner";
 import { Poster } from "../components/Poster";
 import { SearchBox } from "../components/SearchBox";
-import { ErrorNote, Loading } from "../components/Status";
+import { ErrorNote } from "../components/Status";
 import { useApp } from "../state";
 
 interface Side {
@@ -17,7 +19,6 @@ interface Result {
   b: Analysis;
   comparison: Comparison;
   narrative: string;
-  note: string;
 }
 
 const empty: Side = { text: "", picked: null };
@@ -31,14 +32,19 @@ function verdict(result: Result): string {
 }
 
 export function Battle() {
-  const { prefs, loadAnalysis } = useApp();
+  const { prefs, cachedAnalysis, remember } = useApp();
+  const runner = useRunner();
   const [a, setA] = useState<Side>(empty);
   const [b, setB] = useState<Side>(empty);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const loading = runner.busy;
   const [result, setResult] = useState<Result | null>(null);
 
-  const target = (side: Side) => (side.picked ? { id: side.picked.id } : { query: side.text.trim() });
+  const target = (side: Side) => {
+    const cached = side.picked ? cachedAnalysis(side.picked.id) : null;
+    if (cached) return { analysis: cached };
+    return side.picked ? { id: side.picked.id } : { query: side.text.trim() };
+  };
 
   const fight = async () => {
     if (!a.text.trim() || !b.text.trim() || loading) return;
@@ -46,26 +52,17 @@ export function Battle() {
       setError("Pick two different films to compare.");
       return;
     }
-    setLoading(true);
     setError("");
     setResult(null);
-    try {
-      const [first, second] = await Promise.all([loadAnalysis(target(a)), loadAnalysis(target(b))]);
-      if (first.analysis.movie.id === second.analysis.movie.id) throw new Error("Pick two different films to compare.");
-      const comparison = compareScores(dimensionScores(first.analysis.critique), dimensionScores(second.analysis.critique));
-      let narrative = "";
-      let note = "";
-      try {
-        narrative = (await api.compare(first.analysis, second.analysis, prefs)).narrative;
-      } catch (e) {
-        note = `The written comparison is unavailable: ${e instanceof Error ? e.message : "try again later."}`;
-      }
-      setResult({ a: first.analysis, b: second.analysis, comparison, narrative, note });
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not compare these films.");
-    } finally {
-      setLoading(false);
-    }
+    const response = await runner.start(operations.battle(target(a), target(b), prefs));
+    if (!response) return;
+    remember([response.a, response.b]);
+    setResult({
+      a: response.a,
+      b: response.b,
+      comparison: compareScores(dimensionScores(response.a.critique), dimensionScores(response.b.critique)),
+      narrative: response.narrative,
+    });
   };
 
   return (
@@ -93,7 +90,7 @@ export function Battle() {
         Compare
       </button>
       <ErrorNote message={error} />
-      {loading && <Loading text="Analyzing both films — this can take up to 30 seconds…" />}
+      <RunPanel run={runner.run} onCancel={runner.cancel} onRetry={() => void fight()} />
 
       {result && !loading && (
         <div className="analysis">
@@ -142,7 +139,6 @@ export function Battle() {
               ))}
             </section>
           )}
-          {result.note && <p className="notice">{result.note}</p>}
         </div>
       )}
     </div>

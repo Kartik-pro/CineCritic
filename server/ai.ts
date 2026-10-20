@@ -1,123 +1,131 @@
+import { MODEL_ID_PATTERN, PROVIDER_IDS, PROVIDERS, isProviderId, type ProviderId } from "../shared/providers.js";
 import type { ChatMessage } from "../shared/types.js";
-import { HttpError } from "./http.js";
+import { AppError, toAppError } from "./errors.js";
 import { requestKeys } from "./keys.js";
+import { ADAPTERS } from "./providers/index.js";
 
-type Provider = "anthropic" | "openai" | "gemini" | "mistral";
+const SERVER_ORDER: readonly ProviderId[] = ["anthropic", "openai", "gemini", "mistral", "huggingface"];
+const CALL_TIMEOUT_MS = 50_000;
+const MIN_REMAINING_MS = 1_500;
+const BACKOFF_MS = 800;
+const MAX_ATTEMPTS = 2;
+const RETRYABLE: readonly string[] = ["rate_limited", "provider_unavailable", "network"];
 
-const PROVIDERS: Record<Provider, { env: string; model: string }> = {
-  anthropic: { env: "ANTHROPIC_API_KEY", model: "claude-sonnet-5-5" },
-  openai: { env: "OPENAI_API_KEY", model: "gpt-4o-mini" },
-  gemini: { env: "GOOGLE_API_KEY", model: "gemini-3.5-flash" },
-  mistral: { env: "MISTRAL_API_KEY", model: "mistral-large-latest" },
-};
+export interface AiConfig {
+  provider: ProviderId;
+  key: string;
+  model: string;
+  viaRequest: boolean;
+}
 
-const OPENAI_COMPATIBLE: Record<"openai" | "mistral", string> = {
-  openai: "https://api.openai.com/v1/chat/completions",
-  mistral: "https://api.mistral.ai/v1/chat/completions",
-};
+export interface Env {
+  signal: AbortSignal;
+  deadline: number;
+}
 
-export interface GenerateOptions {
+export interface InferOptions extends Env {
   system: string;
   messages: ChatMessage[];
   json?: boolean;
+  maxTokens?: number;
+  config?: AiConfig;
+  onRetry?: (error: AppError) => void;
 }
 
-export function hasServerAiKey(): boolean {
-  return (Object.keys(PROVIDERS) as Provider[]).some((p) => !!process.env[PROVIDERS[p].env]?.trim());
+export interface Inference {
+  text: string;
+  provider: ProviderId;
+  model: string;
+  latencyMs: number;
+  inputTokens?: number;
+  outputTokens?: number;
 }
 
-function configured(): { provider: Provider; key: string; model: string } {
+const serverKey = (provider: ProviderId): string => process.env[PROVIDERS[provider].envVar]?.trim() ?? "";
+
+export const hasServerAiKey = (): boolean => PROVIDER_IDS.some((p) => !!serverKey(p));
+
+function finish(provider: ProviderId, key: string, requested: string, viaRequest: boolean): AiConfig {
+  const meta = PROVIDERS[provider];
+  const model = requested || meta.defaultModel;
+  if (!model) {
+    throw new AppError("invalid_input", {
+      message: `Choose a ${meta.label} model before continuing.`,
+      nextStep: "Open Settings, pick a model and save it as your default.",
+    });
+  }
+  if (!MODEL_ID_PATTERN.test(model)) {
+    throw new AppError("invalid_input", { message: "The model name contains unsupported characters.", nextStep: "Pick a model from the list in Settings." });
+  }
+  return { provider, key, model, viaRequest };
+}
+
+export function resolveConfig(): AiConfig {
   const sent = requestKeys();
   if (sent.ai) {
-    if (!(sent.provider in PROVIDERS)) throw new HttpError(400, "Choose an AI provider in Settings.");
-    const provider = sent.provider as Provider;
-    return { provider, key: sent.ai, model: sent.model || PROVIDERS[provider].model };
+    if (!isProviderId(sent.provider)) {
+      throw new AppError("invalid_input", { message: "Choose an AI provider in Settings.", nextStep: "Open Settings and select a provider." });
+    }
+    return finish(sent.provider, sent.ai, sent.model, true);
   }
   const requested = process.env.AI_PROVIDER?.trim().toLowerCase();
-  const order = Object.keys(PROVIDERS) as Provider[];
-  const candidates = requested && requested in PROVIDERS ? [requested as Provider] : order;
+  const candidates = isProviderId(requested) ? [requested] : SERVER_ORDER;
   for (const provider of candidates) {
-    const key = process.env[PROVIDERS[provider].env]?.trim();
-    if (key) return { provider, key, model: process.env.AI_MODEL?.trim() || PROVIDERS[provider].model };
+    const key = serverKey(provider);
+    if (key) return finish(provider, key, process.env.AI_MODEL?.trim() ?? "", false);
   }
-  throw new HttpError(401, "Add an AI API key in Settings to continue.");
+  throw new AppError("missing_key", { message: "No AI API key is configured.", nextStep: "Add an AI key in Settings." });
 }
 
-async function send(url: string, headers: Record<string, string>, body: unknown): Promise<any> {
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      method: "POST",
-      headers: { "content-type": "application/json", ...headers },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(50_000),
-    });
-  } catch {
-    throw new HttpError(504, "The AI provider did not respond in time. Please try again.");
-  }
-  if (response.ok) return response.json();
-  if (response.status === 401 || response.status === 403)
-    throw new HttpError(401, "The AI provider rejected the API key. Check it in Settings.");
-  if (response.status === 404) throw new HttpError(400, "That AI model was not found. Check the model name in Settings.");
-  if (response.status === 429) throw new HttpError(429, "The AI provider is rate-limiting requests. Try again shortly.");
-  throw new HttpError(503, "The AI provider is temporarily unavailable. Please try again.");
+function sleep(ms: number, signal: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal.aborted) return reject(signal.reason);
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(signal.reason);
+    };
+    const timer = setTimeout(() => {
+      signal.removeEventListener("abort", onAbort);
+      resolve();
+    }, ms);
+    signal.addEventListener("abort", onAbort, { once: true });
+  });
 }
 
-async function call(opts: GenerateOptions): Promise<string> {
-  const { provider, key, model } = configured();
-
-  if (provider === "anthropic") {
-    const data = await send(
-      "https://api.anthropic.com/v1/messages",
-      { "x-api-key": key, "anthropic-version": "2023-06-01" },
-      { model, max_tokens: 4096, system: opts.system, messages: opts.messages },
-    );
-    return (data.content ?? []).map((block: any) => (block.type === "text" ? block.text : "")).join("");
-  }
-
-  if (provider === "gemini") {
-    const data = await send(
-      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
-      { "x-goog-api-key": key },
-      {
-        systemInstruction: { parts: [{ text: opts.system }] },
-        contents: opts.messages.map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })),
-        generationConfig: opts.json ? { responseMimeType: "application/json" } : {},
-      },
-    );
-    const parts: any[] = data.candidates?.[0]?.content?.parts ?? [];
-    return parts.filter((p) => !p.thought).map((p) => p.text ?? "").join("");
-  }
-
-  const data = await send(
-    OPENAI_COMPATIBLE[provider],
-    { authorization: `Bearer ${key}` },
-    {
-      model,
-      messages: [{ role: "system", content: opts.system }, ...opts.messages],
-      ...(opts.json ? { response_format: { type: "json_object" } } : {}),
-    },
-  );
-  const content = data.choices?.[0]?.message?.content;
-  return typeof content === "string" ? content : "";
-}
-
-async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
-  try {
-    return await fn();
-  } catch (error) {
-    if (error instanceof HttpError && (error.status === 503 || error.status === 429)) {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      return fn();
+export async function infer(options: InferOptions): Promise<Inference> {
+  const config = options.config ?? resolveConfig();
+  const adapter = ADAPTERS[config.provider];
+  for (let attempt = 1; ; attempt++) {
+    const remaining = options.deadline - Date.now();
+    if (remaining < MIN_REMAINING_MS) throw new AppError("timeout");
+    const started = Date.now();
+    try {
+      const result = await adapter.generate({
+        key: config.key,
+        model: config.model,
+        system: options.system,
+        messages: options.messages,
+        json: options.json ?? false,
+        ...(options.maxTokens !== undefined ? { maxTokens: options.maxTokens } : {}),
+        signal: options.signal,
+        timeoutMs: Math.min(CALL_TIMEOUT_MS, remaining),
+        secrets: [config.key],
+      });
+      return {
+        text: result.text,
+        provider: config.provider,
+        model: config.model,
+        latencyMs: Date.now() - started,
+        ...(result.inputTokens !== undefined ? { inputTokens: result.inputTokens } : {}),
+        ...(result.outputTokens !== undefined ? { outputTokens: result.outputTokens } : {}),
+      };
+    } catch (error) {
+      const app = toAppError(error, "inference", [config.key]);
+      if (!RETRYABLE.includes(app.code) || attempt >= MAX_ATTEMPTS) throw app;
+      options.onRetry?.(app);
+      await sleep(BACKOFF_MS, options.signal);
     }
-    throw error;
   }
-}
-
-export async function generateText(opts: GenerateOptions): Promise<string> {
-  const text = (await withRetry(() => call(opts))).trim();
-  if (!text) throw new HttpError(502, "The AI returned an empty response. Please try again.");
-  return text;
 }
 
 export function extractJson(text: string): unknown {
@@ -127,15 +135,26 @@ export function extractJson(text: string): unknown {
   return JSON.parse(text.slice(start, end + 1));
 }
 
-export async function generateJson(opts: GenerateOptions): Promise<Record<string, unknown>> {
+export async function generateText(options: InferOptions): Promise<Inference> {
   for (let attempt = 0; attempt < 2; attempt++) {
-    const text = await withRetry(() => call({ ...opts, json: true }));
-    try {
-      const parsed = extractJson(text);
-      if (parsed && typeof parsed === "object") return parsed as Record<string, unknown>;
-    } catch {
-      continue;
-    }
+    const result = await infer(options);
+    const text = result.text.trim();
+    if (text) return { ...result, text };
+    if (attempt === 0) options.onRetry?.(new AppError("empty_response"));
   }
-  throw new HttpError(502, "The AI returned an unreadable response. Please try again.");
+  throw new AppError("empty_response");
+}
+
+export async function generateJson(options: InferOptions): Promise<Inference & { data: Record<string, unknown> }> {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const result = await infer({ ...options, json: true });
+    try {
+      const parsed = extractJson(result.text);
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return { ...result, data: parsed as Record<string, unknown> };
+    } catch {
+      if (attempt === 1) throw new AppError("malformed_output");
+    }
+    if (attempt === 0) options.onRetry?.(new AppError("malformed_output"));
+  }
+  throw new AppError("malformed_output");
 }

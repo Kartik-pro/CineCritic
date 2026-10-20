@@ -4,6 +4,7 @@ import { Ask } from "./pages/Ask";
 import { Battle } from "./pages/Battle";
 import { Critique } from "./pages/Critique";
 import { Discover } from "./pages/Discover";
+import { Monitor } from "./pages/Monitor";
 import { Settings } from "./pages/Settings";
 import { Watchlist } from "./pages/Watchlist";
 import { AppProvider, PAGES, useApp } from "./state";
@@ -15,6 +16,9 @@ function Shell() {
 
   return (
     <>
+      <a className="skip" href="#main">
+        Skip to content
+      </a>
       <header className="top">
         <button className="brand" onClick={() => go("critique")} aria-label="CineCritic home">
           CINE<span>CRITIC</span>
@@ -54,13 +58,14 @@ function Shell() {
           </button>
         </p>
       )}
-      <main>
+      <main id="main" tabIndex={-1}>
         {page === "settings" && <Settings />}
         {page === "critique" && <Critique />}
         {page === "discover" && <Discover />}
         {page === "ask" && <Ask />}
         {page === "battle" && <Battle />}
         {page === "watchlist" && <Watchlist />}
+        {page === "monitor" && <Monitor />}
       </main>
       <footer>
         Film data by TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB. AI scores are subjective assessments, not IMDb or audience ratings.

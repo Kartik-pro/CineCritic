@@ -10,15 +10,20 @@ import {
   type SetStateAction,
 } from "react";
 import type { Analysis, ChatMessage, Movie, SpoilerLevel } from "../shared/types";
-import { EMPTY_KEYS, api, setApiKeys, type Availability, type Options, type StoredKeys, type Target } from "./api";
+import { api, setCredentials, type Availability, type Options, type Target } from "./api";
+import { loadCredentials, saveCredentials, type Credentials } from "./keys";
+import { operations } from "./pipeline/operations";
+import type { Started } from "./pipeline/store";
+import type { CritiqueResponse } from "../shared/types";
 
-export type Page = "critique" | "discover" | "ask" | "battle" | "watchlist" | "settings";
+export type Page = "critique" | "discover" | "ask" | "battle" | "watchlist" | "monitor" | "settings";
 export const PAGES: { id: Page; label: string }[] = [
   { id: "critique", label: "Critique" },
   { id: "discover", label: "Discover" },
   { id: "ask", label: "Ask" },
   { id: "battle", label: "Battle" },
   { id: "watchlist", label: "Watchlist" },
+  { id: "monitor", label: "Monitor" },
   { id: "settings", label: "Settings" },
 ];
 
@@ -72,8 +77,8 @@ interface AppState {
   go: (page: Page) => void;
   prefs: Prefs;
   setPrefs: (prefs: Prefs) => void;
-  keys: StoredKeys;
-  setKeys: (keys: StoredKeys) => void;
+  creds: Credentials;
+  setCreds: (creds: Credentials) => void;
   available: Availability | null;
   current: Analysis | null;
   setCurrent: (analysis: Analysis | null) => void;
@@ -81,7 +86,9 @@ interface AppState {
   pending: Target | null;
   analyze: (target: Target) => void;
   clearPending: () => void;
-  loadAnalysis: (target: Target) => Promise<{ analysis: Analysis; alternatives: Movie[] }>;
+  runAnalysis: (target: Target) => { id: string | null; promise: Promise<CritiqueResponse> };
+  cachedAnalysis: (id: number) => Analysis | null;
+  remember: (analyses: Analysis[]) => void;
   watchlist: Record<number, Entry>;
   saveEntry: (movie: Pick<Movie, "id" | "title" | "year" | "poster">, patch: Partial<Entry>) => void;
   removeEntry: (id: number) => void;
@@ -126,9 +133,16 @@ export function parseEntries(value: unknown): Entry[] {
 export function AppProvider({ children }: { children: ReactNode }) {
   const [page, setPage] = useState<Page>(pageFromHash);
   const [prefs, setPrefs] = useStored<Prefs>("cc.prefs", { spoiler: "none" as SpoilerLevel, language: "English" });
-  const [storedKeys, setKeys] = useStored<StoredKeys>("cc.keys", EMPTY_KEYS);
-  const keys = useMemo(() => ({ ...EMPTY_KEYS, ...storedKeys }), [storedKeys]);
-  setApiKeys(keys);
+  const [creds, setCredsState] = useState<Credentials>(() => {
+    const loaded = loadCredentials();
+    setCredentials(loaded);
+    return loaded;
+  });
+  const setCreds = useCallback((next: Credentials) => {
+    saveCredentials(next);
+    setCredentials(next);
+    setCredsState(next);
+  }, []);
   const [available, setAvailable] = useState<Availability | null>(null);
   const [history, setHistory] = useStored<Analysis[]>("cc.history", []);
   const [watchlist, setWatchlist] = useStored<Record<number, Entry>>("cc.watchlist", {});
@@ -145,7 +159,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => {
       live = false;
     };
-  }, [keys]);
+  }, [creds]);
 
   useEffect(() => {
     const onHash = () => setPage(pageFromHash());
@@ -169,25 +183,35 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const clearPending = useCallback(() => setPending(null), []);
 
-  const loadAnalysis = useCallback(
-    async (target: Target) => {
-      if (target.id) {
-        const hit = history.find(
-          (a) =>
-            a.movie.id === target.id &&
-            a.spoiler === prefs.spoiler &&
-            a.language === prefs.language &&
-            Date.now() - a.createdAt < CACHE_MS,
-        );
-        if (hit) return { analysis: hit, alternatives: [] };
-      }
-      const { analysis, alternatives } = await api.critique(target, prefs);
-      setHistory((prev) =>
-        [analysis, ...prev.filter((a) => a.movie.id !== analysis.movie.id)].slice(0, HISTORY_LIMIT),
-      );
-      return { analysis, alternatives };
+  const remember = useCallback(
+    (analyses: Analysis[]) =>
+      setHistory((prev) => {
+        const incoming = new Set(analyses.map((a) => a.movie.id));
+        return [...analyses, ...prev.filter((a) => !incoming.has(a.movie.id))].slice(0, HISTORY_LIMIT);
+      }),
+    [setHistory],
+  );
+
+  const cachedAnalysis = useCallback(
+    (id: number) =>
+      history.find(
+        (a) => a.movie.id === id && a.spoiler === prefs.spoiler && a.language === prefs.language && Date.now() - a.createdAt < CACHE_MS,
+      ) ?? null,
+    [history, prefs],
+  );
+
+  const runAnalysis = useCallback(
+    (target: Target) => {
+      const hit = target.id ? cachedAnalysis(target.id) : null;
+      if (hit) return { id: null, promise: Promise.resolve<CritiqueResponse>({ analysis: hit, alternatives: [] }) };
+      const started: Started<CritiqueResponse> = operations.critique(target, prefs);
+      const promise = started.promise.then((response) => {
+        remember([response.analysis]);
+        return response;
+      });
+      return { id: started.id, promise };
     },
-    [history, prefs, setHistory],
+    [cachedAnalysis, prefs, remember],
   );
 
   const saveEntry = useCallback<AppState["saveEntry"]>(
@@ -230,10 +254,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AppState>(
     () => ({
-      page, go, prefs, setPrefs, keys, setKeys, available, current, setCurrent, history, pending, analyze, clearPending,
-      loadAnalysis, watchlist, saveEntry, removeEntry, importEntries, chat, setChat,
+      page, go, prefs, setPrefs, creds, setCreds, available, current, setCurrent, history, pending, analyze, clearPending,
+      runAnalysis, cachedAnalysis, remember, watchlist, saveEntry, removeEntry, importEntries, chat, setChat,
     }),
-    [page, go, prefs, setPrefs, keys, setKeys, available, current, history, pending, analyze, clearPending, loadAnalysis, watchlist, saveEntry, removeEntry, importEntries, chat],
+    [page, go, prefs, setPrefs, creds, setCreds, available, current, history, pending, analyze, clearPending, runAnalysis, cachedAnalysis, remember, watchlist, saveEntry, removeEntry, importEntries, chat],
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

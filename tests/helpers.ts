@@ -50,3 +50,47 @@ export function sampleAnalysis(title = "Heat", scores: Partial<Record<DimensionK
     similar: [], spoiler: "none", language: "English", notices: [], createdAt: 0,
   };
 }
+
+export const movie = (id: number, title: string, year: string, extra = {}) => ({
+  id, title, release_date: `${year}-01-01`, overview: "o", poster_path: `/${id}.jpg`, vote_average: 8, vote_count: 100, ...extra,
+});
+
+export const tmdbData = (url: string): unknown => {
+  const u = new URL(url);
+  if (u.pathname === "/3/search/movie") {
+    const q = u.searchParams.get("query");
+    if (q === "nothing") return { results: [] };
+    if (q === "Heat") return { results: [movie(1, "Heat", "1995"), movie(2, "Heat", "1986"), movie(3, "Heat Wave", "2000")] };
+    return { results: [movie(10, String(q), "2020")] };
+  }
+  if (u.pathname === "/3/movie/1") {
+    return {
+      ...movie(1, "Heat", "1995"), runtime: 170, genres: [{ name: "Crime" }], tagline: "t", backdrop_path: "/b.jpg",
+      credits: { crew: [{ job: "Director", name: "Michael Mann" }], cast: [{ name: "Al Pacino", character: "Vincent" }] },
+    };
+  }
+  if (u.pathname === "/3/movie/10") return { ...movie(10, "Arrival", "2016"), runtime: 116, genres: [{ name: "Sci-Fi" }], credits: { crew: [], cast: [] } };
+  if (u.pathname === "/3/movie/1/recommendations") return { results: [movie(5, "Collateral", "2004")] };
+  if (u.pathname === "/3/movie/popular") return { results: [movie(7, "Popular", "2024")], total_pages: 3 };
+  return new Response("{}", { status: 404 });
+};
+
+
+export interface StreamOutcome {
+  events: any[];
+  result?: any;
+  error?: any;
+  status: number;
+}
+
+export async function readStream(res: Response): Promise<StreamOutcome> {
+  const text = await res.text();
+  const outcome: StreamOutcome = { events: [], status: res.status };
+  for (const line of text.split("\n").filter(Boolean)) {
+    const message = JSON.parse(line);
+    if (message.type === "event") outcome.events.push(message.event);
+    else if (message.type === "result") outcome.result = message.data;
+    else if (message.type === "error") outcome.error = message.error;
+  }
+  return outcome;
+}

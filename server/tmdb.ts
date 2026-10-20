@@ -1,5 +1,5 @@
 import type { ListKind, Movie, MovieDetails, MovieListResponse } from "../shared/types.js";
-import { HttpError } from "./http.js";
+import { AppError } from "./errors.js";
 import { requestKeys } from "./keys.js";
 
 const API = "https://api.themoviedb.org/3";
@@ -7,9 +7,15 @@ const IMAGE = "https://image.tmdb.org/t/p";
 
 type Raw = Record<string, any>;
 
+export const tmdbKey = (): string => requestKeys().tmdb || process.env.TMDB_API_KEY?.trim() || "";
+
+export function requireTmdb(): void {
+  if (!tmdbKey()) throw new AppError("missing_key", { message: "A TMDB API key is missing.", nextStep: "Add your TMDB key in Settings." });
+}
+
 async function tmdb(path: string, params: Record<string, string | number> = {}): Promise<Raw> {
-  const key = requestKeys().tmdb || process.env.TMDB_API_KEY?.trim();
-  if (!key) throw new HttpError(401, "Add your TMDB API key in Settings to continue.");
+  const key = tmdbKey();
+  if (!key) requireTmdb();
   const url = new URL(API + path);
   const headers: Record<string, string> = {};
   if (key.startsWith("eyJ")) headers.Authorization = `Bearer ${key}`;
@@ -19,13 +25,14 @@ async function tmdb(path: string, params: Record<string, string | number> = {}):
   let response: Response;
   try {
     response = await fetch(url, { headers, signal: AbortSignal.timeout(8000) });
-  } catch {
-    throw new HttpError(502, "Could not reach TMDB. Please try again.");
+  } catch (error) {
+    if ((error as { name?: string })?.name === "TimeoutError") throw new AppError("timeout", { message: "TMDB did not respond in time." });
+    throw new AppError("network", { message: "Could not reach TMDB." });
   }
-  if (response.status === 401) throw new HttpError(401, "TMDB rejected the API key. Check it in Settings.");
-  if (response.status === 404) throw new HttpError(404, "Film not found on TMDB.");
-  if (response.status === 429) throw new HttpError(429, "TMDB is rate-limiting requests. Try again shortly.");
-  if (!response.ok) throw new HttpError(502, "TMDB returned an error. Please try again.");
+  if (response.status === 401) throw new AppError("auth_failed", { message: "TMDB rejected the API key.", nextStep: "Check the TMDB key in Settings." });
+  if (response.status === 404) throw new AppError("not_found", { message: "Film not found on TMDB." });
+  if (response.status === 429) throw new AppError("rate_limited", { message: "TMDB is rate-limiting requests." });
+  if (!response.ok) throw new AppError("tmdb_error");
   return (await response.json()) as Raw;
 }
 
@@ -107,7 +114,7 @@ const crewName = (credits: Raw, ...jobs: string[]) =>
 export async function getDetails(id: number): Promise<MovieDetails> {
   const data = await tmdb(`/movie/${id}`, { append_to_response: "credits" });
   const base = toMovie(data);
-  if (!base) throw new HttpError(404, "Film not found on TMDB.");
+  if (!base) throw new AppError("not_found", { message: "Film not found on TMDB." });
   const credits: Raw = data.credits ?? {};
   return {
     ...base,

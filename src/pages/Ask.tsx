@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { api } from "../api";
-import { ErrorNote } from "../components/Status";
+import { RunPanel } from "../components/Pipeline";
+import { operations } from "../pipeline/operations";
+import { useRunner } from "../pipeline/useRunner";
 import { useApp } from "../state";
 
 const SUGGESTIONS = [
@@ -17,8 +18,8 @@ export function Ask() {
   }, [current, history]);
   const [filmId, setFilmId] = useState<number | null>(current?.movie.id ?? films[0]?.movie.id ?? null);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const runner = useRunner();
+  const loading = runner.busy;
   const end = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -27,22 +28,21 @@ export function Ask() {
 
   const analysis = films.find((a) => a.movie.id === filmId) ?? null;
 
-  const send = async (question: string) => {
+  const send = async (question: string, history = chat) => {
     const trimmed = question.trim();
     if (!trimmed || loading) return;
-    const before = chat;
-    setChat([...before, { role: "user", content: trimmed }]);
+    setChat([...history, { role: "user", content: trimmed }]);
     setInput("");
-    setLoading(true);
-    setError("");
-    try {
-      const { answer } = await api.ask(trimmed, before, analysis, prefs);
-      setChat((prev) => [...prev, { role: "assistant", content: answer }]);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not get an answer.");
-    } finally {
-      setLoading(false);
-    }
+    const result = await runner.start(operations.ask(trimmed, history, analysis, prefs));
+    if (result) setChat((prev) => [...prev, { role: "assistant", content: result.answer }]);
+  };
+
+  const retry = () => {
+    const question = runner.run?.retry?.text;
+    if (!question) return;
+    const last = chat[chat.length - 1];
+    const history = last?.role === "user" && last.content === question ? chat.slice(0, -1) : chat;
+    void send(question, history);
   };
 
   const submit = (event: FormEvent) => {
@@ -90,10 +90,9 @@ export function Ask() {
             {m.content}
           </div>
         ))}
-        {loading && <div className="bubble assistant typing">Thinking…</div>}
         <div ref={end} />
       </div>
-      <ErrorNote message={error} />
+      <RunPanel run={runner.run} onCancel={runner.cancel} onRetry={retry} />
       <form className="composer" onSubmit={submit}>
         <input
           type="text"

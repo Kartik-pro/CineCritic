@@ -1,6 +1,7 @@
 import { DIMENSIONS, type Critique, type Dimension, type DimensionKey, type MovieDetails, type SpoilerLevel } from "../shared/types.js";
 import { validScore } from "../shared/scoring.js";
-import { generateJson } from "./ai.js";
+import { generateJson, type InferOptions } from "./ai.js";
+import { AppError } from "./errors.js";
 import { QUICK_TAKE_WORDS, critiqueSystem } from "./prompts.js";
 import { enforce } from "./spoilers.js";
 import { facts } from "./tmdb.js";
@@ -50,12 +51,12 @@ export function sanitizeCritique(raw: Record<string, unknown>): Critique {
   };
 }
 
-export async function runCritique(
-  movie: MovieDetails,
-  spoiler: SpoilerLevel,
-  language: string,
-): Promise<{ critique: Critique; removed: number }> {
-  const raw = await generateJson({
+export const hasContent = (critique: Critique): boolean =>
+  critique.overall !== null || DIMENSIONS.some(({ key }) => critique.dimensions[key].score !== null);
+
+export function generateCritique(movie: MovieDetails, spoiler: SpoilerLevel, language: string, options: Omit<InferOptions, "system" | "messages">) {
+  return generateJson({
+    ...options,
     system: critiqueSystem(spoiler, language),
     messages: [
       {
@@ -64,7 +65,10 @@ export async function runCritique(
       },
     ],
   });
+}
+
+export function parseCritique(raw: Record<string, unknown>): Critique {
   const critique = sanitizeCritique(raw);
-  const removed = enforce(critique, spoiler);
-  return { critique, removed };
+  if (!hasContent(critique)) throw new AppError("malformed_output", { message: "The AI response did not contain a usable analysis." });
+  return critique;
 }

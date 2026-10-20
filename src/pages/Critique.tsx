@@ -3,38 +3,36 @@ import type { Movie } from "../../shared/types";
 import type { Target } from "../api";
 import { AnalysisView } from "../components/AnalysisView";
 import { SearchBox } from "../components/SearchBox";
-import { ErrorNote, Loading } from "../components/Status";
+import { RunPanel } from "../components/Pipeline";
+import { ErrorNote } from "../components/Status";
+import { useRunner } from "../pipeline/useRunner";
 import { useApp } from "../state";
 
 const EXAMPLES = ["Oppenheimer (2023)", "Dune: Part Two", "Interstellar", "Parasite", "Past Lives"];
 
 export function Critique() {
-  const { prefs, current, setCurrent, pending, clearPending, loadAnalysis } = useApp();
+  const { prefs, current, setCurrent, pending, clearPending, runAnalysis } = useApp();
+  const runner = useRunner();
   const [text, setText] = useState("");
   const [picked, setPicked] = useState<Movie | null>(null);
   const [alternatives, setAlternatives] = useState<Movie[]>([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const latest = useRef(0);
+  const loading = runner.busy;
 
   const run = useCallback(
     async (target: Target) => {
       const ticket = ++latest.current;
-      setLoading(true);
       setError("");
-      try {
-        const result = await loadAnalysis(target);
-        if (ticket !== latest.current) return;
-        setCurrent(result.analysis);
-        setAlternatives(result.alternatives);
-        setText(result.analysis.movie.year ? `${result.analysis.movie.title} (${result.analysis.movie.year})` : result.analysis.movie.title);
-      } catch (e) {
-        if (ticket === latest.current) setError(e instanceof Error ? e.message : "Something went wrong.");
-      } finally {
-        if (ticket === latest.current) setLoading(false);
-      }
+      const { id, promise } = runAnalysis(target);
+      if (id === null) runner.reset();
+      const result = await (id === null ? promise.catch(() => undefined) : runner.start({ id, promise }));
+      if (ticket !== latest.current || !result) return;
+      setCurrent(result.analysis);
+      setAlternatives(result.alternatives);
+      setText(result.analysis.movie.year ? `${result.analysis.movie.title} (${result.analysis.movie.year})` : result.analysis.movie.title);
     },
-    [loadAnalysis, setCurrent],
+    [runAnalysis, runner.start, runner.reset, setCurrent],
   );
 
   useEffect(() => {
@@ -85,7 +83,7 @@ export function Critique() {
       </section>
 
       <ErrorNote message={error} />
-      {loading && <Loading text="Gathering credits and writing the critique — usually 10–20 seconds…" />}
+      <RunPanel run={runner.run} onCancel={runner.cancel} onRetry={() => runner.run?.retry?.target && void run(runner.run.retry.target)} />
 
       {!loading && current && (
         <>

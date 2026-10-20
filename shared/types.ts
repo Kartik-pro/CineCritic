@@ -79,6 +79,7 @@ export interface Analysis {
   language: string;
   notices: string[];
   createdAt: number;
+  generatedBy?: { provider: string; model: string };
 }
 
 export interface Pick extends Movie {
@@ -101,4 +102,22 @@ export interface MovieListResponse {
   items: Movie[];
   page: number;
   totalPages: number;
+}
+
+export interface BattleResponse {
+  a: Analysis;
+  b: Analysis;
+  narrative: string;
+}
+
+export interface ConnectionResult {
+  ok: true;
+  provider: string;
+  model: string;
+  latencyMs: number;
+  reply: string;
+  modelListed: boolean | null;
+  inputTokens?: number;
+  outputTokens?: number;
+  checkedAt: number;
 }
