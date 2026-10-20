@@ -1,46 +1,70 @@
 # 🎬 CineCritic
 
-[![Vercel Deployment](https://shields.io)](https://vercel.app)
-[![TypeScript](https://shields.io)](https://typescriptlang.org)
-[![Vite](https://shields.io)](https://vite.dev)
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000000?logo=vercel&logoColor=white)](https://vercel.com)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)](https://vite.dev)
+[![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
 
-An **AI-powered film analysis and cinema intelligence platform** built with React, TypeScript, and Vite. CineCritic brings AI-assisted movie critique, film discovery, conversational questions, movie battles, and multi-provider AI configuration into a single interface. 
+An **AI-powered film analysis and cinema intelligence platform** built with React, TypeScript, and Vite. CineCritic brings AI-assisted movie critique, film discovery, conversational questions, movie battles, and multi-provider AI configuration into a single interface.
 
-Instead of hiding behind a generic loading spinner, CineCritic features a **live execution pipeline monitor** that surfaces real-time backend updates, metrics, and workflow transparently to the user.
+Instead of hiding behind a generic loading spinner, CineCritic features a **live execution pipeline monitor** that surfaces real-time backend updates, metrics, and workflow progress to the user.
+
+---
+
+## 📑 Table of Contents
+
+- [Architecture Diagram](#-architecture-diagram)
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [System Architecture](#-system-architecture)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [Environment Configuration](#-environment-configuration)
+- [Security & API Key Management](#-security--api-key-management)
+- [Pipeline Streaming Schema](#-pipeline-streaming-schema)
+- [Testing](#-testing)
+- [Deployment](#-deployment)
 
 ---
 
 ## 🗺️ Architecture Diagram
 
-Explore the full interactive visualization of the repository architecture directly via GitDiagram.
+Explore the full interactive architecture of this repository on GitDiagram:
 
-[![Architecture diagram of Kartik-pro/CineCritic](https://gitdiagram.com)](https://gitdiagram.com)
+👉 **[Open CineCritic on GitDiagram](https://gitdiagram.com/Kartik-pro/CineCritic)**
 
-> 💡 *Click the diagram above to explore the interactive repository structural relationships.*
+> 💡 Swap `github.com` for `gitdiagram.com` in the repo URL to open the same view for any GitHub repository.
 
 ---
 
 ## ✨ Features
 
 ### 🎥 AI-Powered Film Workflows
-* **Critique:** Run deep, AI-assisted film critiques.
-* **Discover:** Explore new movies dynamically via tailored discovery flows.
-* **Ask:** Chat directly with your configured AI provider about specific films.
-* **Battle:** Compare two different films side-by-side using analytical metrics.
-* **Connection Testing:** Run validation steps to verify your API credentials seamlessly.
+
+| Workflow | What it does |
+| :--- | :--- |
+| **Critique** | Runs deep, AI-assisted film critiques. |
+| **Discover** | Explores new movies through tailored discovery flows. |
+| **Ask** | Chat with your configured AI provider about specific films. |
+| **Battle** | Compares two films side by side using analytical metrics. |
+| **Connection Test** | Validates your API credentials before you run a workflow. |
 
 ### 🤖 Multi-Provider AI Support
-Configure your own keys directly in-browser. Supported engines include:
-* Google Gemini
-* OpenAI
-* Anthropic
-* Mistral
-* Hugging Face Inference Providers
+
+Configure your own keys directly in the browser. Supported providers:
+
+- Google Gemini
+- OpenAI
+- Anthropic
+- Mistral
+- Hugging Face Inference Providers
 
 ### ⚡ Live Pipeline Monitoring
-* **Transparent Execution:** Real-time visibility into active stages (e.g., "2 of 6 films verified").
-* **Execution Status & Metrics:** Track countdowns, elapsed durations, retries, and errors.
-* **Browser-Local Run Monitor:** Reviews the last 40 recorded executions in your browser with precise metrics without storing prompt details or keys.
+
+- **Transparent execution:** real-time visibility into active stages (e.g. "2 of 6 films verified").
+- **Status and metrics:** countdowns, elapsed time, retries, and errors.
+- **Browser-local run monitor:** keeps the last 40 executions in your browser with precise metrics, without storing prompt details or keys.
 
 ---
 
@@ -48,54 +72,44 @@ Configure your own keys directly in-browser. Supported engines include:
 
 | Technology | Purpose |
 | :--- | :--- |
-| **React 19** | User interface components and reactive rendering |
-| **TypeScript** | Strict type-safety across client-side code and API contracts |
-| **Vite 7** | Lightning-fast local development server and optimized frontend builds |
-| **Node.js 20+** | JavaScript runtime environment for tooling and functions |
-| **Vercel Functions** | Serverless API endpoints handling streaming protocols |
-| **AI Providers** | Native SDK integrations with Gemini, OpenAI, Anthropic, and Mistral |
-| **Hugging Face** | Unified endpoint router (`https://huggingface.co`) |
-| **TMDB API** | Optional source metadata connection for live film lookup validation |
-| **tsx** | Direct execution engine for test suites |
-| **Vercel Speed Insights** | Real-time production web performance and core web vitals tracking |
+| **React 19** | UI components and reactive rendering |
+| **TypeScript** | Strict type safety across client code and API contracts |
+| **Vite 7** | Fast dev server and optimized frontend builds |
+| **Node.js 20+** | Runtime for tooling and serverless functions |
+| **Vercel Functions** | Serverless API endpoints that handle streaming |
+| **AI Providers** | Integrations with Gemini, OpenAI, Anthropic, and Mistral |
+| **Hugging Face** | Unified Inference Providers router (`https://router.huggingface.co/v1`) |
+| **TMDB API** | Optional metadata source for live film lookup and validation |
+| **tsx** | Direct execution of the test suites |
+| **Vercel Speed Insights** | Production performance and Core Web Vitals tracking |
 
 ---
 
 ## 🏗️ System Architecture
 
 ### High-Level Request Flow
-```text
-┌─────────────────────┐
-│       Browser       │
-│  React + TypeScript │
-└──────────┬──────────┘
-           │
-┌──────────▼──────────┐
-│   User Interface    │
-│ Settings & Workflows│
-└──────────┬──────────┘
-           │
-┌──────────▼──────────┐
-│ Streaming API Calls │
-│       NDJSON        │
-└──────────┬──────────┘
-           │
-┌──────────▼──────────┐
-│ TypeScript API      │
-│ Routes in api/      │
-└──────────┬──────────┘
-           │
-┌──────────┴─────────────┐
-│                        │
-┌───────▼────────┐      ┌───▼──────────────┐
-│  AI Providers  │      │    Film Data     │
-│Gemini / OpenAI │      │ TMDB (optional)  │
-│Anthropic / etc.│      └──────────────────┘
-└────────────────┘
-                ┌──────────────────────┐
-                │  Pipeline Monitoring │
-                │ Browser-Local History│
-                └──────────────────────┘
+
+```mermaid
+flowchart TD
+    A["Browser<br/>React + TypeScript"] --> B["User Interface<br/>Settings and Workflows"]
+    B --> C["Streaming API Calls<br/>NDJSON"]
+    C --> D["TypeScript API Routes<br/>api/"]
+    D --> E["AI Providers<br/>Gemini / OpenAI / Anthropic / Mistral / Hugging Face"]
+    D --> F["Film Data<br/>TMDB (optional)"]
+    D -. "stage events" .-> G["Pipeline Monitoring<br/>Browser-local history"]
+    G -.-> A
+```
+
+### Server Layer
+
+```mermaid
+flowchart LR
+    API["api/ routes"] --> OPS["server/operations.ts<br/>orchestrator"]
+    OPS --> CTX["server/context.ts<br/>context builder"]
+    OPS --> PRM["server/prompts.ts<br/>prompt templates"]
+    OPS --> AI["server/ai.ts<br/>inference routing"]
+    OPS --> TMDB["server/tmdb.ts<br/>TMDB layer"]
+    AI --> PRV["server/providers/<br/>provider adapters"]
 ```
 
 ---
@@ -105,28 +119,28 @@ Configure your own keys directly in-browser. Supported engines include:
 ```text
 CineCritic/
 ├── api/                  # TypeScript serverless API endpoints (Vercel)
-├── public/               # Static assets & public media assets
-├── server/               # Shared backend utilities (adapters, context builder, prompt engines)
-│   ├── providers/        # AI provider middleware & structural wrappers
+├── public/               # Static assets
+├── server/               # Shared backend utilities
+│   ├── providers/        # AI provider adapters and wrappers
 │   ├── ai.ts             # Primary inference routing
 │   ├── context.ts        # Context construction for models
-│   ├── operations.ts     # Internal execution sequence orchestrator
-│   ├── prompts.ts        # Prompt configurations & structural templates
+│   ├── operations.ts     # Execution sequence orchestrator
+│   ├── prompts.ts        # Prompt configurations and templates
 │   └── tmdb.ts           # TMDB interface layer
-├── shared/               # Pure type configurations and system protocols
+├── shared/               # Types and protocols shared by client and server
 │   ├── pipeline.ts       # Typed pipeline interfaces and NDJSON structures
-│   ├── providers.ts      # Structured multi-provider schema profiles
-│   └── scoring.ts        # Film comparison analytics parameters
-├── src/                  # React Single Page Application (Vite project)
-│   ├── components/       # Reusable layout UI components
-│   ├── pages/            # View managers (Critique, Discover, Battle, Monitor, Settings, etc.)
+│   ├── providers.ts      # Multi-provider schema profiles
+│   └── scoring.ts        # Film comparison scoring parameters
+├── src/                  # React SPA (Vite)
+│   ├── components/       # Reusable UI components
+│   ├── pages/            # Views (Critique, Discover, Battle, Monitor, Settings, ...)
 │   ├── pipeline/         # Client-side stream parsers and runners
-│   ├── keys.ts           # Browser credentials management core
-│   └── state.tsx         # Context providers for global runtime values
-├── tests/                # Automated integration and unit test runners
-├── vercel.json           # Vercel deployment specifications and function definitions
-├── tsconfig.json         # Strict TypeScript compiler definitions
-└── package.json          # Node system requirements and scripts
+│   ├── keys.ts           # Browser credential management
+│   └── state.tsx         # Global context providers
+├── tests/                # Unit and integration tests
+├── vercel.json           # Vercel deployment and function config
+├── tsconfig.json         # Strict TypeScript config
+└── package.json          # Dependencies and scripts
 ```
 
 ---
@@ -134,83 +148,140 @@ CineCritic/
 ## 🚀 Getting Started
 
 ### Prerequisites
-* **Node.js:** Version 20.x or later installed
-* **Package Manager:** `npm` (comes bundled with Node)
-* **Vercel CLI:** Installed globally if testing serverless functions locally (`npm i -g vercel`)
 
-### 1. Clone the Repository
+- **Node.js** 20.x or later
+- **npm** (bundled with Node)
+- **Vercel CLI**, installed globally to run the serverless functions locally:
+
 ```bash
-git clone https://github.com
+npm i -g vercel
+```
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Kartik-pro/CineCritic.git
 cd CineCritic
 ```
 
-### 2. Install Dependencies
+### 2. Install dependencies
+
 ```bash
 npm install
 ```
 
-### 3. Start Local Development Engine
+### 3. Start the local dev environment
 
-To run both the **React Frontend** and **Vercel Serverless API Functions** simultaneously, execute:
+Run the React frontend and the Vercel serverless functions together:
+
 ```bash
 npx vercel dev
 ```
-Your local application environment will boot at: **`http://localhost:3000`**
 
-> ⚠️ **Note:** Running `npm run dev` will boot the frontend via Vite, but it **will not** resolve serverless endpoints located inside `/api`. Use `npx vercel dev` for testing live AI workflows.
+The app boots at **http://localhost:3000**.
+
+> ⚠️ **Note:** `npm run dev` starts only the Vite frontend and **does not** serve the endpoints in `/api`. Use `npx vercel dev` to test live AI workflows.
 
 ---
 
 ## 🔑 Environment Configuration
 
-Creating an environment file is **entirely optional**. By default, users can fill in their keys directly within the application's browser UI. Use local environment keys if you want your deployed server instance to supply fallback credentials.
+A `.env` file is **entirely optional**. Users can enter their keys in the app's UI. Add server-side keys only if you want your deployment to supply fallback credentials.
 
-Create a `.env` file in your root folder:
+Create a `.env` file in the project root:
+
 ```dotenv
-# Film Data Catalog Provider
+# Film data provider
 TMDB_API_KEY=your_tmdb_v3_or_v4_token
 
-# AI Processing Provider Keys
+# AI provider keys
 ANTHROPIC_API_KEY=your_anthropic_api_key
 OPENAI_API_KEY=your_openai_api_key
 GOOGLE_API_KEY=your_google_gemini_api_key
 MISTRAL_API_KEY=your_mistral_api_key
 HF_TOKEN=your_fine_grained_huggingface_token
 
-# Server Fallback Configuration Defaults
+# Server fallback defaults
 AI_PROVIDER=gemini
 AI_MODEL=your_preferred_model_id
 ```
 
-### Environment Variable Layout
+### Variable Reference
 
-| Variable Name | Required | Purpose / Notes |
+| Variable | Required | Purpose |
 | :--- | :--- | :--- |
-| `TMDB_API_KEY` | Optional | Resolves exact meta-information, matching posters, and filtering metadata. |
-| `ANTHROPIC_API_KEY` | Optional | Core API token credential for Anthropic-backed models. |
-| `OPENAI_API_KEY` | Optional | Core API token credential for OpenAI-backed models. |
-| `GOOGLE_API_KEY` | Optional | Core API token credential for Google Gemini models. |
-| `MISTRAL_API_KEY` | Optional | Core API token credential for Mistral analytics models. |
-| `HF_TOKEN` | Optional | Token requires explicit `Make calls to Inference Providers` permissions. |
-| `AI_PROVIDER` | Optional | Sets the fallback engine. Options: `anthropic`, `openai`, `gemini`, `mistral`, `huggingface`. |
-| `AI_MODEL` | Optional | The specific Model ID fallback identifier; required if using Hugging Face server fallback. |
+| `TMDB_API_KEY` | Optional | Resolves exact film metadata, posters, and filtering data. |
+| `ANTHROPIC_API_KEY` | Optional | Credential for Anthropic-backed models. |
+| `OPENAI_API_KEY` | Optional | Credential for OpenAI-backed models. |
+| `GOOGLE_API_KEY` | Optional | Credential for Google Gemini models. |
+| `MISTRAL_API_KEY` | Optional | Credential for Mistral models. |
+| `HF_TOKEN` | Optional | Needs the **Make calls to Inference Providers** permission. |
+| `AI_PROVIDER` | Optional | Fallback engine: `anthropic`, `openai`, `gemini`, `mistral`, or `huggingface`. |
+| `AI_MODEL` | Optional | Fallback model ID. Required when using Hugging Face as the server fallback. |
 
 ---
 
 ## 🔐 Security & API Key Management
 
-* **Storage Location:** Keys stay entirely on your device. They save inside temporary browser memory (`sessionStorage`) by default.
-* **Persistent Storage:** Ticking **"Remember keys on this device"** safely shifts them to local persistent storage (`localStorage`).
-* **Encryption Notice:** Browser storage layers are unencrypted. Please use restricted, capped API credentials to avoid risk.
-* **Transmission Protocol:** Keys are transferred securely via standard HTTPS payloads directly to your endpoint infrastructure. The server loads them down into runtime objects for the request lifecycle, never tracking or writing logs of strings.
+- **Storage location:** keys stay on your device. By default they live in `sessionStorage` and disappear when the tab closes.
+- **Persistent storage:** ticking **"Remember keys on this device"** moves them to `localStorage`.
+- **Encryption notice:** browser storage is not encrypted. Use restricted, spend-capped API keys.
+- **Transmission:** keys are sent over HTTPS to your own API routes, held in memory for the duration of the request, and never logged or persisted by the server.
 
 ---
 
 ## ⚡ Pipeline Streaming Schema
 
-Workflows stream event updates utilizing Newline-Delimited JSON (**NDJSON**). Individual event updates conform to the structural layout below:
+Workflows stream progress as **Newline-Delimited JSON (NDJSON)**: one JSON object per line, each describing a stage update.
 
 ```json
-{
-  "executionId": "example-run-id",
-  "operation": "critique",
+{"executionId":"example-run-id","operation":"critique","stage":"verifying","message":"2 of 6 films verified","progress":{"current":2,"total":6},"elapsedMs":4210,"retries":0}
+{"executionId":"example-run-id","operation":"critique","stage":"complete","message":"Critique ready","elapsedMs":9870,"retries":0}
+```
+
+### Reading the stream on the client
+
+```ts
+const response = await fetch("/api/critique", { method: "POST", body });
+const reader = response.body!.getReader();
+const decoder = new TextDecoder();
+let buffer = "";
+
+while (true) {
+  const { value, done } = await reader.read();
+  if (done) break;
+  buffer += decoder.decode(value, { stream: true });
+
+  const lines = buffer.split("\n");
+  buffer = lines.pop() ?? "";
+
+  for (const line of lines) {
+    if (line.trim()) handleEvent(JSON.parse(line));
+  }
+}
+```
+
+> 📝 The field names above are illustrative. The authoritative event types live in [`shared/pipeline.ts`](shared/pipeline.ts).
+
+---
+
+## 🧪 Testing
+
+Tests run directly with `tsx`. Check the `scripts` section of `package.json` for the exact commands, for example:
+
+```bash
+npm test
+```
+
+---
+
+## 🌐 Deployment
+
+CineCritic deploys to Vercel with zero extra configuration beyond `vercel.json`.
+
+```bash
+vercel          # preview deployment
+vercel --prod   # production deployment
+```
+
+Add any optional server-side keys from [Environment Configuration](#-environment-configuration) in the Vercel project settings under **Environment Variables**.
