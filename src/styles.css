@@ -302,3 +302,8 @@ code { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; background: va
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Account profile */
+.profile { display: grid; grid-template-columns: max-content 1fr; gap: 8px 20px; margin: 0; }
+.profile dt { color: var(--muted); font-size: 13px; }
+.profile dd { margin: 0; overflow-wrap: anywhere; }

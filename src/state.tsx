@@ -16,7 +16,7 @@ import { operations } from "./pipeline/operations";
 import type { Started } from "./pipeline/store";
 import type { CritiqueResponse } from "../shared/types";
 
-export type Page = "critique" | "discover" | "ask" | "battle" | "watchlist" | "monitor" | "settings";
+export type Page = "critique" | "discover" | "ask" | "battle" | "watchlist" | "monitor" | "account" | "settings";
 export const PAGES: { id: Page; label: string }[] = [
   { id: "critique", label: "Critique" },
   { id: "discover", label: "Discover" },
@@ -24,6 +24,7 @@ export const PAGES: { id: Page; label: string }[] = [
   { id: "battle", label: "Battle" },
   { id: "watchlist", label: "Watchlist" },
   { id: "monitor", label: "Monitor" },
+  { id: "account", label: "Account" },
   { id: "settings", label: "Settings" },
 ];
 

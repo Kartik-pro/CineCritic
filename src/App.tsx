@@ -1,5 +1,7 @@
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { LANGUAGES, SPOILER_LABELS, SPOILER_LEVELS, type SpoilerLevel } from "../shared/types";
+import { AuthProvider, useAuth } from "./auth";
+import { Account } from "./pages/Account";
 import { Ask } from "./pages/Ask";
 import { Battle } from "./pages/Battle";
 import { Critique } from "./pages/Critique";
@@ -11,6 +13,7 @@ import { AppProvider, PAGES, useApp } from "./state";
 
 function Shell() {
   const { page, go, prefs, setPrefs, watchlist, available } = useApp();
+  const { configured, user } = useAuth();
   const needsKeys = available !== null && (!available.tmdb || !available.ai);
   const saved = Object.keys(watchlist).length;
 
@@ -24,9 +27,9 @@ function Shell() {
           CINE<span>CRITIC</span>
         </button>
         <nav aria-label="Main">
-          {PAGES.map((p) => (
+          {PAGES.filter((p) => p.id !== "account" || configured).map((p) => (
             <button key={p.id} className={page === p.id ? "nav on" : "nav"} aria-current={page === p.id ? "page" : undefined} onClick={() => go(p.id)}>
-              {p.label}
+              {p.id === "account" && !user ? "Sign in" : p.label}
               {p.id === "watchlist" && saved > 0 && <span className="count">{saved}</span>}
             </button>
           ))}
@@ -59,6 +62,7 @@ function Shell() {
         </p>
       )}
       <main id="main" tabIndex={-1}>
+        {page === "account" && <Account />}
         {page === "settings" && <Settings />}
         {page === "critique" && <Critique />}
         {page === "discover" && <Discover />}
@@ -77,8 +81,10 @@ function Shell() {
 export default function App() {
   return (
     <AppProvider>
-      <Shell />
-      <SpeedInsights />
+      <AuthProvider>
+        <Shell />
+        <SpeedInsights />
+      </AuthProvider>
     </AppProvider>
   );
 }
